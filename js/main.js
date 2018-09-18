@@ -118,7 +118,7 @@ function app_versions(){
     log(r)
     const apps = JSON.parse(r)
     addResponse("app_versions", apps)
-  })  
+  })
 }
 
 function summary(){
@@ -138,7 +138,7 @@ function log(message, type="info"){
   if (currentSlide && currentSlide.id){
     context = currentSlide.id
   }
-  
+
   const line = context + "::" + type + " - " + message
   window.DATA['log'].push(line)
   logArea.innerHTML = window.DATA['log'].join("\n")
@@ -218,7 +218,7 @@ Reveal.initialize({
     { src: 'plugin/markdown/markdown.js' },
     { src: 'plugin/notes/notes.js', async: true },
     { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
-  ], 
+  ],
   anything: [{
     className: "cyrest",
     defaults: {"name": "start", "title": "Cytoscape Testing"},
@@ -232,6 +232,7 @@ Reveal.initialize({
       }
     })
   }],
+  embedded: true,
   controls: false,
   controlsBackArrows: "hidden",
   controlsTutorial: false,
