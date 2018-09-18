@@ -61,7 +61,7 @@ function galfiltered(){
       log("Edges in galfiltered = " + edges.length, "response")
       addResponse("galfiltered", {'cyrestEdgeCount': edges.length})
       
-      const check = currentSlide.getElementsByClassName("edgeCount")[0]
+      const check = currentSlide.getElementsByClassName("edgeCountMatches")[0]
       check.labels[0].innerText = "Edge count is " + edges.length + "?"
       
     });
@@ -70,7 +70,7 @@ function galfiltered(){
       log("Nodes in galfiltered = " + nodes.length, "response")
       addResponse("galfiltered", {'cyrestNodeCount': nodes.length})
       
-      const check = currentSlide.getElementsByClassName("nodeCount")[0]
+      const check = currentSlide.getElementsByClassName("nodeCountMatches")[0]
       check.labels[0].innerText = "Node count is " + nodes.length + "?"
       
     });
