@@ -60,11 +60,19 @@ function galfiltered(){
       edges = JSON.parse(edges)
       log("Edges in galfiltered = " + edges.length, "response")
       addResponse("galfiltered", {'cyrestEdgeCount': edges.length})
+      
+      const check = currentSlide.getElementsByClassName("edgeCount")[0]
+      check.labels[0].innerText = "Edge count is " + edges.length + "?"
+      
     });
     cyCaller.get("/v1/networks/" + suid + "/nodes", function(nodes){
       nodes = JSON.parse(nodes)
       log("Nodes in galfiltered = " + nodes.length, "response")
       addResponse("galfiltered", {'cyrestNodeCount': nodes.length})
+      
+      const check = currentSlide.getElementsByClassName("nodeCount")[0]
+      check.labels[0].innerText = "Node count is " + nodes.length + "?"
+      
     });
     showControls()
   });
@@ -147,13 +155,16 @@ function log(message, type="info"){
   }
 }
 
-function buildInput(n, text){
-  if (text === "CONFIRM"){
-    return "<input type='checkbox' id='" + n + "'>"
+function buildInput(n){
+  let entry = ""
+  if (n['type'] === 'checkbox'){
+    entry = "<input type='checkbox' id='" + n['id'] + "' class='" + n['id'] + "'/>" + 
+    "<label for='" + n['id'] + "'>" + n['text'] + "</label>"
   }else{
-    return "<label for='" + n + "'>" + text + "</label>"
-      + "<input type='text' id='" + n + "'' name='" + n + "'/>"
+    entry = "<label for='" + n['id'] + "'>" + n['text'] + "</label>"
+      + "<input type='text' id='" + n['id'] + "'' name='" + n['id'] + "'/>"
   }
+  return "<div class='entry'>" + entry + "</div>"
 }
 
 function buildSlide(options, container){
@@ -164,15 +175,21 @@ function buildSlide(options, container){
   if (!options.hasOwnProperty('log') || options["log"] !== 'false'){
     slide += '<textarea class="slide_log" readonly></textarea>';
   }
+  slide += '<div class="entries" id="entries">'
   if (options.inputs){
-    slide += '<div class="entry" id="entry">'
     for (var n in options.inputs){
-      slide += buildInput(n, options.inputs[n])
+      slide += buildInput(options.inputs[n])
     }
-    slide += "</div>"
   }
+  slide += "</div>"
   // slide += "<p class='result'></p>"
   container.innerHTML = slide;
+}
+
+function clear(callback){
+  cyCaller.delete("/v1/session", {}, function(r){
+    callback();
+  })
 }
 
 function call(id){
@@ -180,9 +197,9 @@ function call(id){
     "status": status,
     "version": version,
     "close_session": close_session,
-    "galfiltered": galfiltered,
-    "diffusion": diffusion,
-    "layout": layout,
+    "galfiltered": () => { clear(galfiltered) },
+    "diffusion": () => { clear(diffusion) },
+    "layout": () => { clear(layout) },
     "session_save": session_save,
     "app_versions": app_versions,
     "summary": summary
@@ -204,7 +221,11 @@ function save_answers(slide){
   while (i < inputs.length){
     const inp = inputs[i];
     const id = slide.id;
-    const obj = {[inp.name] : inp.value}
+    const value = {
+      "checkbox": inp.checked,
+      "text": inp.value
+    }[inp.type]
+    const obj = {[inp.id] : value}
     addResponse(id, obj)
     i++;
   }
@@ -212,7 +233,7 @@ function save_answers(slide){
 
 function showControls(vis=true){
   // TODO: How to handle errors that prevent this from being called?
-  Reveal.configure({controls: vis})
+  // Reveal.configure({controls: vis})
 }
 
 Reveal.initialize({
@@ -236,7 +257,6 @@ Reveal.initialize({
       }
     })
   }],
-  controls: false,
   controlsBackArrows: "hidden",
   controlsTutorial: false,
   progress: true, //TODO: change to false to prevent backstepping
@@ -255,4 +275,3 @@ Reveal.addEventListener( 'slidechanged', function( event ) {
 const cyCaller = new CyCaller();
 cyCaller.setLogCallBack(log)
 log("Started Cytoscape Testing")
-showControls()
