@@ -56,12 +56,12 @@ function galfiltered(){
   const url = "http://chianti.ucsd.edu/~bsettle/galFiltered.cx"
   cyCaller.load_file_from_url(url, function(suid){
     this.log("Loaded galfiltered with SUID " + suid)
-    cyCaller.get("/v1/networks/"+suid+"/edges", function(edges){
+    cyCaller.get("/v1/networks/" + suid + "/edges", function(edges){
       edges = JSON.parse(edges)
       log("Edges in galfiltered = " + edges.length, "response")
       addResponse("galfiltered", {'cyrestEdgeCount': edges.length})
     });
-    cyCaller.get("/v1/networks/"+suid+"/nodes", function(nodes){
+    cyCaller.get("/v1/networks/" + suid + "/nodes", function(nodes){
       nodes = JSON.parse(nodes)
       log("Nodes in galfiltered = " + nodes.length, "response")
       addResponse("galfiltered", {'cyrestNodeCount': nodes.length})
@@ -71,46 +71,41 @@ function galfiltered(){
 }
 
 function diffusion(){
+  const select_nodes = (suid, node_suids) => {
+    cyCaller.put("/v1/networks/"+ suid + "/nodes/selected", node_suids, function(){
+      cyCaller.post("/diffusion/v1/currentView/diffuse", {}, () => {
+        showControls()
+      })
+    })
+  }
   const url = "http://chianti.ucsd.edu/~bsettle/galFiltered.cx"
   cyCaller.load_file_from_url(url, function(suid){
     cyCaller.get("/v1/networks/" + suid + "/tables/defaultnode/rows", function(r){
-      console.log(r)
+      const rows = JSON.parse(r)
+      for (var i in rows){
+        if (rows[i]['COMMON'] === 'RAP1'){
+          select_nodes(suid, [rows[i]['SUID']])
+          return;
+        }
+      }
     })
   });
-  // cyCaller.load_file('galFiltered.cys')
-  // suid = cyCaller.get_network_suid()
-  // rows = cyCaller.get("/v1/networks/" + str(suid) + "/tables/defaultnode/rows").json()
-  // node_suid = -1
-  // for row in rows:
-  //     if row['COMMON'] == 'RAP1':
-  //         node_suid = row['SUID']
-  //         break
-  // selected_nodes = [node_suid]
-  // cyCaller.put("/v1/networks/"+str(suid) + "/nodes/selected", selected_nodes)
-  // cyCaller.post("/diffusion/v1/currentView/diffuse", None)
-  // user_input = input(os.linesep + "Has Diffusion run and selected more nodes? (y/n)")
-  // self.assertTrue(CyTestSupport.TestUtils.is_yes(user_input))
-
 }
 
 function layout(){
-  // cyCaller.load_file('galFiltered.cys')
-  // suid = cyCaller.get_network_suid()
-  // cyCaller.get("/v1/apply/layouts/circular/" + str(suid))
-  // user_input = input(os.linesep + "Has the network been laid out using the circular layout? (y/n)")
-  // self.assertTrue(CyTestSupport.TestUtils.is_yes(user_input))
+  const url = "http://chianti.ucsd.edu/~bsettle/galFiltered.cx"
+  cyCaller.load_file_from_url(url, function(suid){
+    cyCaller.get("/v1/apply/layouts/circular/" + suid)
+  })
 }
 
 function session_save(){
-  // path = os.path.join("test_results", "galFiltered_save.cys")
-  // abspath = os.path.abspath(path)
-  // self.assertFalse(os.path.exists(abspath))
-  // cyCaller.load_file('galFiltered.cys')
-  // cyCaller.post("/v1/session?file=" + abspath)
-  // self.assertTrue(os.path.exists(abspath))
-  // statinfo = os.stat(abspath)
-  // # Picked an arbitrary length here. We merely want to check that something was generated.
-  // self.assertGreater(statinfo.st_size, 70000)
+  const url = "http://chianti.ucsd.edu/~bsettle/galFiltered.cx"
+  cyCaller.load_file_from_url(url, function(suid){
+    const abspath = ""
+    cyCaller.post("/v1/session?file=" + abspath)
+    //TODO assert size is greater than 70000b
+  })
 }
 
 function app_versions(){
@@ -118,7 +113,7 @@ function app_versions(){
     log(r)
     const apps = JSON.parse(r)
     addResponse("app_versions", apps)
-  })
+  })  
 }
 
 function summary(){
@@ -138,7 +133,7 @@ function log(message, type="info"){
   if (currentSlide && currentSlide.id){
     context = currentSlide.id
   }
-
+  
   const line = context + "::" + type + " - " + message
   window.DATA['log'].push(line)
   logArea.innerHTML = window.DATA['log'].join("\n")
@@ -149,6 +144,15 @@ function log(message, type="info"){
       log.innerHTML += message + "\n"
       log.scrollTop = log.scrollHeight;
     }
+  }
+}
+
+function buildInput(n, text){
+  if (text === "CONFIRM"){
+    return "<input type='checkbox' id='" + n + "'>"
+  }else{
+    return "<label for='" + n + "'>" + text + "</label>"
+      + "<input type='text' id='" + n + "'' name='" + n + "'/>"
   }
 }
 
@@ -163,8 +167,7 @@ function buildSlide(options, container){
   if (options.inputs){
     slide += '<div class="entry" id="entry">'
     for (var n in options.inputs){
-      slide += "<label for='" + n + "'>" + options.inputs[n] + "</label>"
-      slide += "<input type='text' id='" + n + "'' name='" + n + "'/>"
+      slide += buildInput(n, options.inputs[n])
     }
     slide += "</div>"
   }
@@ -208,6 +211,7 @@ function save_answers(slide){
 }
 
 function showControls(vis=true){
+  // TODO: How to handle errors that prevent this from being called?
   Reveal.configure({controls: vis})
 }
 
@@ -218,7 +222,7 @@ Reveal.initialize({
     { src: 'plugin/markdown/markdown.js' },
     { src: 'plugin/notes/notes.js', async: true },
     { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
-  ],
+  ], 
   anything: [{
     className: "cyrest",
     defaults: {"name": "start", "title": "Cytoscape Testing"},
@@ -232,10 +236,10 @@ Reveal.initialize({
       }
     })
   }],
-  embedded: true,
   controls: false,
   controlsBackArrows: "hidden",
   controlsTutorial: false,
+  progress: true, //TODO: change to false to prevent backstepping
   keyboard: false,
   overview: false,
 });
