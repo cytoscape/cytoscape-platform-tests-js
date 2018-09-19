@@ -86,7 +86,7 @@ describe("Cytoscape", function() {
       'SBML Reader': "3.3.4",
       'OpenCL Prefuse Layout': "3.5.0",
       'CX Support': "2.2.4"
-  }
+  };
     cyCaller.post("/v1/commands/apps/list installed", [], function(r){
       var testValue = JSON.parse(r);
       for (app in testValue.data) {
