@@ -44,4 +44,13 @@ describe("Cytoscape", function() {
     };
     expect(testValue).toEqual(expectedValue);
   });
+ 
+  it("layout", function() {
+    var testValue = window.DATA.responses["layout"]
+    var expectedValue = { 
+      circular_layout: true
+    };
+    expect(testValue).toEqual(expectedValue);
+  });
+  
 });
