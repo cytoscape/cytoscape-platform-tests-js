@@ -28,12 +28,6 @@
     link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
     document.getElementsByTagName('head')[0].appendChild(link);
   </script>
-  <script>
-    var testValue = "none";
-    function set(value){
-      testValue = value;
-    }
-</script>
 </head>
 <body>
   <body>
@@ -42,7 +36,6 @@
     </div>
   <div style="width: 100%; height: 50%">
   <div class="reveal">
-
     <div class="slides">
       <section id="init">
         <div class="cyrest">
@@ -53,8 +46,7 @@
           "log": "false"
         }-->
         </div>
-        <button onClick="set('rock')">Set var</button>
-       <button onClick="window.runtests();">Run tests</button>
+        
       </section>
       <section id="install">
         <h2>Download the Cytoscape Milestone Release</h2>
@@ -91,6 +83,7 @@
         you are testing"
         }-->
         </div>
+        <button onClick="window.runtests();">Run tests</button>
       </section>
       <section id="close_session">
         <div class="cyrest">
