@@ -107,7 +107,10 @@ function diffusion(){
 function layout(){
   const url = "http://chianti.ucsd.edu/~bsettle/galFiltered.cx"
   cyCaller.load_file_from_url(url, function(suid){
-    cyCaller.get("/v1/apply/layouts/circular/" + suid)
+    cyCaller.get("/v1/apply/layouts/circular/" + suid, 
+    function(){
+      showControls();
+    })
   })
 }
 
