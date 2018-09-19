@@ -3,27 +3,6 @@ let currentSlide = undefined;
 
 
 const logArea = document.getElementsByTagName('textarea')[0]
-const app_version_dict = {
-    'NetworkAnalyzer': "3.3.2",
-    'Biomart Web Service Client': "3.3.2",
-    'CyNDEx-2': "2.2.4.SNAPSHOT",
-    'cyREST': "3.8.0",
-    'CyCL': "3.5.0",
-    'Welcome Screen': "3.5.2",
-    'ID Mapper': "3.6.3",
-    'JSON Support': "3.6.2",
-    'Network Merge': "3.3.4",
-    'Core Apps': "3.4.0",
-    'copycatLayout': "1.2.3",
-    'cyBrowser': "1.0.4",
-    'BioPAX Reader': "3.3.3",
-    'PSICQUIC Web Service Client': "3.4.0",
-    'Diffusion': "1.5.4.SNAPSHOT",
-    'PSI-MI Reader': "3.3.3",
-    'SBML Reader': "3.3.4",
-    'OpenCL Prefuse Layout': "3.5.0",
-    'CX Support': "2.2.4"
-}
 
 function tester(){
   addResponse("tester", {"appVersion": window.navigator['appVersion']})
@@ -176,14 +155,6 @@ function session_save(){
  })
 }
 
-function app_versions(){
-  cyCaller.post("/v1/commands/apps/list installed", {}, function(r){
-    log(r)
-    const apps = JSON.parse(r)
-    addResponse("app_versions", apps)
-  })  
-}
-
 function summary(){
   logArea.innerHTML = JSON.stringify(window.DATA['responses'])
 }
@@ -267,7 +238,6 @@ function call(id){
     "diffusion": () => { clearSession(diffusion) },
     "layout": () => { clearSession(layout) },
     "session_save": () => { clearSession(session_save) },
-    "app_versions": app_versions,
     "summary": summary
   }
   

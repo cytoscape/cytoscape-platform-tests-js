@@ -90,9 +90,9 @@ class CyCaller {
     }
     
     if (hasData){
-      data = JSON.stringify(data)
+      data = JSON.stringify(data);
     }else{
-      data = {}
+      data = null;
     }
     
     this.request(http_method,

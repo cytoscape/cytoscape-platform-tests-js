@@ -1,7 +1,8 @@
 describe("Cytoscape", function() {
 
   beforeAll(function() {
-    console.log(window.DATA.responses)
+    console.log(window.DATA.responses);
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
   });
 
   beforeEach(function() {
@@ -52,5 +53,36 @@ describe("Cytoscape", function() {
     };
     expect(testValue).toEqual(expectedValue);
   });
-  
+
+  it("verify app versions", function(done) {
+    var expectedValues =
+    {
+      'NetworkAnalyzer': "3.3.2",
+      'Biomart Web Service Client': "3.3.2",
+      'CyNDEx-2': "2.2.4.SNAPSHOT",
+      'cyREST': "3.8.0",
+      'CyCL': "3.5.0",
+      'Welcome Screen': "3.5.2",
+      'ID Mapper': "3.6.3",
+      'JSON Support': "3.6.2",
+      'Network Merge': "3.3.4",
+      'Core Apps': "3.4.0",
+      'copycatLayout': "1.2.3",
+      'cyBrowser': "1.0.4",
+      'BioPAX Reader': "3.3.3",
+      'PSICQUIC Web Service Client': "3.4.0",
+      'Diffusion': "1.5.4.SNAPSHOT",
+      'PSI-MI Reader': "3.3.3",
+      'SBML Reader': "3.3.4",
+      'OpenCL Prefuse Layout': "3.5.0",
+      'CX Support': "2.2.4"
+  }
+    cyCaller.post("/v1/commands/apps/list installed", [], function(r){
+      var testValue = JSON.parse(r);
+      for (app in testValue.data) {
+        expect(app['version']).toEqual(expectedValues[app['name']]);
+      }
+      done();
+    });
+  });
 });
