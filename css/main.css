@@ -104,3 +104,8 @@ section iframe {
   height: 400px;
   background-color: white;
 }
+
+section#install p{
+  font-size: 20px;
+  margin: 0px;
+}

@@ -25,6 +25,10 @@ const app_version_dict = {
     'CX Support': "2.2.4"
 }
 
+function tester(){
+  addResponse("tester", {"appVersion": window.navigator['appVersion']})
+}
+
 /* SLIDES */
 function status(){
   cyCaller.get("/v1", function(v){
@@ -194,6 +198,7 @@ function clear(callback){
 
 function call(id){
   const funcs = {
+    "tester": tester,
     "status": status,
     "version": version,
     "close_session": close_session,
