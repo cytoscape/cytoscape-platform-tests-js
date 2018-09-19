@@ -43,6 +43,7 @@
   height: 150px;
 }
 
+/* Checkbox inputs */
 .entry .check {
   width: 20px;
   position: relative;
@@ -99,7 +100,8 @@ div.entries {
     padding: 20px;
 }
 
-section iframe {
+/* INSTALL SLIDE */
+section#install iframe {
   width: 90%;
   height: 400px;
   background-color: white;
@@ -108,4 +110,33 @@ section iframe {
 section#install p{
   font-size: 20px;
   margin: 0px;
+}
+
+/* Drag n Drop file input */
+#drop-area {
+  border: 2px dashed #ccc;
+  border-radius: 20px;
+  width: 480px;
+  font-family: sans-serif;
+  margin: auto;
+  padding: 0px 20px 20px 20px;
+  font-size: 25px;
+}
+#drop-area.highlight {
+  border-color: purple;
+}
+
+.my-form .button {
+  display: inline-block;
+  padding: 10px;
+  background: #ccc;
+  cursor: pointer;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+#drop-area .button:hover {
+  background: #ddd;
+}
+#fileElem {
+  display: none;
 }

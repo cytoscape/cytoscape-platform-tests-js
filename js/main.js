@@ -111,13 +111,66 @@ function layout(){
   })
 }
 
+function handleCYS(area, files){
+  addResponse("session_save", {"file_size": files[0].size})
+  area.style.backgroundColor = "#669166"
+}
+
+function createCysInput(){
+  const dropArea = document.createElement("div")
+  dropArea.id = "drop-area"
+  dropArea.innerHTML = '<form class="my-form">' +
+    '<p>Drag the .cys file onto the dashed area</p>' +
+    '<input type="file" id="fileElem" accept=".cys" onchange="handleCYS(this.parentElement.parentElement, this.files)">' +
+    '<label class="button" for="fileElem">Select CYS</label>' +
+  '</form>';
+  ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, preventDefaults, false)
+  })
+
+  function preventDefaults (e) {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+  ;['dragenter', 'dragover'].forEach(eventName => {
+    dropArea.addEventListener(eventName, highlight, false)
+  })
+
+  ;['dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, unhighlight, false)
+  })
+
+  function highlight(e) {
+    dropArea.classList.add('highlight')
+  }
+
+  function unhighlight(e) {
+    dropArea.classList.remove('highlight')
+  }
+  dropArea.addEventListener('drop', handleDrop, false)
+
+  function handleDrop(e) {
+    let dt = e.dataTransfer
+    let files = dt.files
+
+    handleCYS(dropArea, files)
+  }
+  
+  return dropArea;
+}
+
 function session_save(){
   const url = "http://chianti.ucsd.edu/~bsettle/galFiltered.cx"
   cyCaller.load_file_from_url(url, function(suid){
-    const abspath = ""
-    cyCaller.post("/v1/session?file=" + abspath)
-    //TODO assert size is greater than 70000b
-  })
+    cyCaller.post("/v1/session?file=", {}, (loc) => {
+      loc = JSON.parse(loc)['file']
+      const text = currentSlide.getElementsByClassName('text')[0]
+      text.innerText = "Saved session file to " + loc + ".cys"
+      
+      const entries = currentSlide.getElementsByClassName('entries')[0]
+      entries.appendChild(createCysInput())
+    })
+ })
 }
 
 function app_versions(){
@@ -167,9 +220,11 @@ function buildInput(n){
   if (n['type'] === 'checkbox'){
     entry = "<input type='checkbox' id='" + n['id'] + "' class='" + n['id'] + "'/>" + 
     "<label for='" + n['id'] + "'>" + n['text'] + "</label>"
-  }else{
+  }else if (n['type'] === 'text'){
     entry = "<label for='" + n['id'] + "'>" + n['text'] + "</label>"
       + "<input type='text' id='" + n['id'] + "'' name='" + n['id'] + "'/>"
+  }else {
+    entry = "<input type='" + n['type'] + "' id='" + n['id'] + "' class='" + n['id'] + "'/>"
   }
   return "<div class='entry'>" + entry + "</div>"
 }
@@ -193,7 +248,7 @@ function buildSlide(options, container){
   container.innerHTML = slide;
 }
 
-function clear(callback){
+function clearSession(callback){
   cyCaller.delete("/v1/session", {}, function(r){
     callback();
   })
@@ -205,10 +260,10 @@ function call(id){
     "status": status,
     "version": version,
     "close_session": close_session,
-    "galfiltered": () => { clear(galfiltered) },
-    "diffusion": () => { clear(diffusion) },
-    "layout": () => { clear(layout) },
-    "session_save": session_save,
+    "galfiltered": () => { clearSession(galfiltered) },
+    "diffusion": () => { clearSession(diffusion) },
+    "layout": () => { clearSession(layout) },
+    "session_save": () => { clearSession(session_save) },
     "app_versions": app_versions,
     "summary": summary
   }
@@ -229,6 +284,9 @@ function save_answers(slide){
   let i = 0;
   while (i < inputs.length){
     const inp = inputs[i];
+    if (inp.type === 'file'){
+      continue;
+    }
     const id = slide.id;
     const value = {
       "checkbox": inp.checked,
