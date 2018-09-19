@@ -60,25 +60,25 @@ function galfiltered(){
   const url = "http://chianti.ucsd.edu/~bsettle/galFiltered.cx"
   cyCaller.load_file_from_url(url, function(suid){
     this.log("Loaded galfiltered with SUID " + suid)
+    var edges = []
     cyCaller.get("/v1/networks/" + suid + "/edges", function(edges){
       edges = JSON.parse(edges)
       log("Edges in galfiltered = " + edges.length, "response")
-      addResponse("galfiltered", {'cyrestEdgeCount': edges.length})
+      addResponse("galfiltered", )
       
       const check = currentSlide.getElementsByClassName("edgeCountMatches")[0]
       check.labels[0].innerText = "Edge count is " + edges.length + "?"
-      
+      cyCaller.get("/v1/networks/" + suid + "/nodes", function(nodes){
+        nodes = JSON.parse(nodes)
+        log("Nodes in galfiltered = " + nodes.length, "response")
+        addResponse("galfiltered", {'cyrestNodeCount': nodes.length,
+                                    'cyrestEdgeCount': edges.length})
+        
+        const check = currentSlide.getElementsByClassName("nodeCountMatches")[0]
+        check.labels[0].innerText = "Node count is " + nodes.length + "?"
+        showControls();
+      });
     });
-    cyCaller.get("/v1/networks/" + suid + "/nodes", function(nodes){
-      nodes = JSON.parse(nodes)
-      log("Nodes in galfiltered = " + nodes.length, "response")
-      addResponse("galfiltered", {'cyrestNodeCount': nodes.length})
-      
-      const check = currentSlide.getElementsByClassName("nodeCountMatches")[0]
-      check.labels[0].innerText = "Node count is " + nodes.length + "?"
-      
-    });
-    showControls()
   });
 }
 

@@ -13,7 +13,7 @@ describe("Cytoscape", function() {
     var expectedValue = { 
       allAppsStarted: true,
       apiVersion: 'v1'
-    }
+    };
     expect(testValue).toEqual(expectedValue);
   });
 
@@ -22,7 +22,18 @@ describe("Cytoscape", function() {
     var expectedValue = { 
       cytoscapeVersion: '3.7.0-SNAPSHOT',
       apiVersion: 'v1'
-    }
+    };
+    expect(testValue).toEqual(expectedValue);
+  });
+
+  it("check galFiltered counts", function() {
+    var testValue = window.DATA.responses["galfiltered"]
+    var expectedValue = 
+      {'cyrestEdgeCount': 359, 
+       'cyrestNodeCount': 330,
+       'nodeCountMatches': true,
+       'edgeCountMatches': true
+      };
     expect(testValue).toEqual(expectedValue);
   });
 });
