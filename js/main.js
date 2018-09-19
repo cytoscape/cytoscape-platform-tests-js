@@ -140,7 +140,7 @@ function addResponse(name, data){
   window.res = Object.assign(window.DATA.responses[name], data)//.push(data)
 }
 
-function log(message, type="info"){
+function log(message, type="info", clear=false){
   let context = "log";
   if (currentSlide && currentSlide.id){
     context = currentSlide.id
@@ -153,6 +153,9 @@ function log(message, type="info"){
   if (currentSlide){
     const log = currentSlide.getElementsByClassName("slide_log")[0]
     if (log){
+      if (clear){
+        log.innerHTML = ""
+      }
       log.innerHTML += message + "\n"
       log.scrollTop = log.scrollHeight;
     }
@@ -209,7 +212,8 @@ function call(id){
     "app_versions": app_versions,
     "summary": summary
   }
-  log("Starting test")
+  
+  log("Starting test", "init", true)
   if (funcs.hasOwnProperty(id)){
     funcs[id]()
   }else {
