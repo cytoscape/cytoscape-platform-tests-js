@@ -9,25 +9,6 @@ function tester(){
 }
 
 /* SLIDES */
-function status(){
-  cyCaller.get("/v1", function(v){
-    log(v)
-    v = JSON.parse(v)
-    data = {"allAppsStarted": v['allAppsStarted'], "apiVersion": v['apiVersion']}
-    addResponse("status", data)
-    showControls()
-  })
-}
-
-function version(){
-  cyCaller.get("/v1/version", function(v){
-    log(v)
-    v = JSON.parse(v)
-    addResponse("version", v)
-    showControls()
-  })
-}
-
 function close_session(){
   cyCaller.delete("/v1/session", {}, function(r){
     showControls();
@@ -231,8 +212,6 @@ function clearSession(callback){
 function call(id){
   const funcs = {
     "tester": tester,
-    "status": status,
-    "version": version,
     "close_session": close_session,
     "galfiltered": () => { clearSession(galfiltered) },
     "diffusion": () => { clearSession(diffusion) },

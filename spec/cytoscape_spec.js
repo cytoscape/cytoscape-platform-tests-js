@@ -9,22 +9,32 @@ describe("Cytoscape", function() {
 
   });
 
-  it("check status", function() {
-    var testValue = window.DATA.responses["status"]
+  it("check status", function(done) {
+    var testValue = window.DATA.responses["status"];
     var expectedValue = { 
       allAppsStarted: true,
       apiVersion: 'v1'
     };
-    expect(testValue).toEqual(expectedValue);
+    cyCaller.get("/v1", function(v){
+      log(v)
+      v = JSON.parse(v)
+      data = {"allAppsStarted": v['allAppsStarted'], "apiVersion": v['apiVersion']}
+      expect(data).toEqual(expectedValue);
+      done();
+    })
   });
 
-  it("check version", function() {
-    var testValue = window.DATA.responses["version"]
+  it("check version", function(done) {
     var expectedValue = { 
       cytoscapeVersion: '3.7.0-SNAPSHOT',
       apiVersion: 'v1'
     };
-    expect(testValue).toEqual(expectedValue);
+    cyCaller.get("/v1/version", function(v){
+      log(v)
+      v = JSON.parse(v)
+      expect(v).toEqual(expectedValue);
+      done();
+    });
   });
 
   it("check galFiltered counts", function() {
