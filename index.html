@@ -120,37 +120,29 @@
         }-->
         </div>
       </section>
-      <section id="runjasmine">
-          <div class="cyrest">
-              <!--{
-              "title": "Ready to run automated tests!",
-              "text": "Click the button below to run the automated test sequence in Jasmine."
-              }-->
-              </div>
-        <button onClick="window.runtests();" style="font-size: 32px;">Run tests</button>
-      </section>
       <section id="session_save">
-        <div class="cyrest">
-        <!--{
-        "title": "Session Save",
-        "text": "Saving Cytoscape session file...",
-        "log": "false"
-        }-->
+        <h2>Session Save</h2>
+        <p class="text">Saving Cytoscape session file...</p>
+        <div id="drop-area" style="visibility: hidden">
+          <form class="drop-form">
+            <p>Drag the .cys file onto the dashed area</p>
+            <input type="file" id="fileElem" accept=".cys" onchange="handleCYS(this.parentElement.parentElement, this.files)">
+            <label class="button" for="fileElem">Select CYS</label>
+          </form>
         </div>
       </section>
-      
-
       <section id="summary">
         <div class="cyrest">
           <!--{
-          "title": "Response Summary"
+          "title": "Ready to run automated tests!",
+          "text": "The test results will be shown in the bottom panel"
           }-->
         </div>
       </section>
     </div>
   </div>
 </div>
-  <div id="tests" style="width: 100%; height=50%; display: block; overflow:auto; margin-top:30px">
+  <div id="tests">
     </div>
     <script src="lib/js/head.min.js"></script>
     <script src="js/reveal.js"></script>

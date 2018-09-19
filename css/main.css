@@ -126,7 +126,7 @@ section#install p{
   border-color: purple;
 }
 
-.my-form .button {
+#drop-area .drop-form .button {
   display: inline-block;
   padding: 10px;
   background: #ccc;
@@ -139,4 +139,13 @@ section#install p{
 }
 #fileElem {
   display: none;
+}
+
+/* jasmine */
+#tests {
+  width: 100%;
+  display: block;
+  overflow:auto;
+  margin-top:30px;
+  height:50%;
 }

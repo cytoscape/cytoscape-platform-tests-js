@@ -12,6 +12,8 @@ function tester(){
 function close_session(){
   cyCaller.delete("/v1/session", {}, function(r){
     showControls();
+    const resp = JSON.parse(r)
+    addResponse("close_session", resp)
     return;
   })
 }
@@ -79,14 +81,10 @@ function handleCYS(area, files){
   area.style.backgroundColor = "#669166"
 }
 
-function createCysInput(){
-  const dropArea = document.createElement("div")
-  dropArea.id = "drop-area"
-  dropArea.innerHTML = '<form class="my-form">' +
-    '<p>Drag the .cys file onto the dashed area</p>' +
-    '<input type="file" id="fileElem" accept=".cys" onchange="handleCYS(this.parentElement.parentElement, this.files)">' +
-    '<label class="button" for="fileElem">Select CYS</label>' +
-  '</form>';
+function initDropArea(){
+  const dropArea = document.getElementById('drop-area')
+  dropArea.style.visibility="visible";
+  
   ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
     dropArea.addEventListener(eventName, preventDefaults, false)
   })
@@ -130,14 +128,14 @@ function session_save(){
       const text = currentSlide.getElementsByClassName('text')[0]
       text.innerText = "Saved session file to " + loc + ".cys"
       
-      const entries = currentSlide.getElementsByClassName('entries')[0]
-      entries.appendChild(createCysInput())
+      initDropArea();
     })
  })
 }
 
 function summary(){
-  logArea.innerHTML = JSON.stringify(window.DATA['responses'])
+  log(JSON.stringify(window.DATA['responses']))
+  window.runtests();
 }
 
 /* HELPERS */
@@ -145,7 +143,7 @@ function addResponse(name, data){
   if (!window.DATA.responses.hasOwnProperty(name)){
     window.DATA.responses[name] = {}
   }
-  window.res = Object.assign(window.DATA.responses[name], data)//.push(data)
+  window.res = Object.assign(window.DATA.responses[name], data)
 }
 
 function log(message, type="info", clear=false){
@@ -233,8 +231,7 @@ function save_answers(slide){
     return;
   }
   const inputs = slide.getElementsByTagName("input")
-  let i = 0;
-  while (i < inputs.length){
+  for (let i = 0; i < inputs.length; i++){
     const inp = inputs[i];
     if (inp.type === 'file'){
       continue;
@@ -246,7 +243,6 @@ function save_answers(slide){
     }[inp.type]
     const obj = {[inp.id] : value}
     addResponse(id, obj)
-    i++;
   }
 }
 

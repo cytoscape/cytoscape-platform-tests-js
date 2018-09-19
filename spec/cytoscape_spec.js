@@ -95,4 +95,9 @@ describe("Cytoscape", function() {
       done();
     });
   });
+  
+  it("save session size", function(){
+    const fileSize = window.DATA.responses['session_save']['file_size']
+    expect(fileSize).toBeGreaterThan(700000);
+  })
 });
