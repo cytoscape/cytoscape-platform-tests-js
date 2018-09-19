@@ -1,7 +1,7 @@
 describe("Cytoscape", function() {
 
   beforeAll(function() {
-    //console.log(window.DATA['log'])
+    console.log(window.DATA.responses)
   });
 
   beforeEach(function() {
@@ -34,6 +34,14 @@ describe("Cytoscape", function() {
        'nodeCountMatches': true,
        'edgeCountMatches': true
       };
+    expect(testValue).toEqual(expectedValue);
+  });
+
+  it("diffusion", function() {
+    var testValue = window.DATA.responses["diffusion"]
+    var expectedValue = { 
+      "diffused" : true
+    };
     expect(testValue).toEqual(expectedValue);
   });
 });
