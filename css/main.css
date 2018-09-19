@@ -98,3 +98,9 @@ div.entries {
     border-radius: 5px;
     padding: 20px;
 }
+
+section iframe {
+  width: 90%;
+  height: 400px;
+  background-color: white;
+}
