@@ -210,7 +210,7 @@ function call (slide) {
   if (funcs.hasOwnProperty(slide.id)) {
     Reveal.configure({ controls: false })
     funcs[slide.id](slide)
-    setTimeout(() => { Reveal.configure({ controls: true }) }, 5000)
+    setTimeout(() => { Reveal.configure({ controls: true }) }, 10000)
   } else {
     showControls()
   }
@@ -262,7 +262,7 @@ Reveal.initialize({
   }],
   controlsBackArrows: 'hidden',
   controlsTutorial: false,
-  progress: true, // TODO: change to false to prevent backstepping
+  progress: false,
   keyboard: false,
   overview: false
 })
