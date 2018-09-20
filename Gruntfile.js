@@ -119,6 +119,10 @@ module.exports = function(grunt) {
 			}
 		},
 
+		unzip: {
+			'docs': 'build.zip'
+		},
+
 		watch: {
 			js: {
 				files: [ 'Gruntfile.js', 'js/reveal.js' ],
@@ -183,7 +187,11 @@ module.exports = function(grunt) {
 	grunt.registerTask( 'css', [ 'sass', 'autoprefixer', 'cssmin' ] );
 
 	// Package presentation to archive
-	grunt.registerTask( 'package', [ 'default', 'zip' ] );
+	grunt.registerTask('package', ['default', 'zip']);
+
+	grunt.registerTask('build', ['default', 'zip', 'unzip']);
+
+
 
 	// Serve presentation locally
 	grunt.registerTask( 'serve', [ 'connect', 'watch' ] );
