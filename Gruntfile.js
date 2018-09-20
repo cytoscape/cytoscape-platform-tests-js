@@ -115,7 +115,7 @@ module.exports = function(grunt) {
 					'spec/**',
 					'**.md'
 				],
-				dest: 'reveal-js-presentation.zip'
+				dest: 'build.zip'
 			}
 		},
 
