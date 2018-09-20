@@ -36,6 +36,12 @@ describe("Cytoscape", function() {
       done();
     });
   });
+  
+  it("check close session", function(){
+    const value = window.DATA.responses['close_session'];
+    const expectedValue = {new_session: true};
+    expect(value).toEqual(expectedValue);
+  })
 
   it("check galFiltered counts", function() {
     var testValue = window.DATA.responses["galfiltered"]
@@ -100,4 +106,6 @@ describe("Cytoscape", function() {
     const fileSize = window.DATA.responses['session_save']['file_size']
     expect(fileSize).toBeGreaterThan(700000);
   })
+  // TODO: further automated testing...
+  
 });

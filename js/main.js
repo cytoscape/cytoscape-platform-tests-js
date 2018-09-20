@@ -4,21 +4,20 @@ let currentSlide = undefined;
 
 const logArea = document.getElementsByTagName('textarea')[0]
 
-function tester(){
-  addResponse("tester", {"appVersion": window.navigator['appVersion']})
+function tester(slide){
+  addResponse(slide.id, {"appVersion": window.navigator['appVersion']})
+  showControls();
 }
 
 /* SLIDES */
-function close_session(){
+function close_session(slide){
   cyCaller.delete("/v1/session", {}, function(r){
     showControls();
-    const resp = JSON.parse(r)
-    addResponse("close_session", resp)
     return;
   })
 }
 
-function galfiltered(){
+function galfiltered(slide){
   const url = "http://chianti.ucsd.edu/~bsettle/galFiltered.cx"
   cyCaller.load_file_from_url(url, function(suid){
     this.log("Loaded galfiltered with SUID " + suid)
@@ -26,17 +25,17 @@ function galfiltered(){
     cyCaller.get("/v1/networks/" + suid + "/edges", function(edges){
       edges = JSON.parse(edges)
       log("Edges in galfiltered = " + edges.length, "response")
-      addResponse("galfiltered", )
+      addResponse(slide.id, )
       
-      const check = currentSlide.getElementsByClassName("edgeCountMatches")[0]
+      const check = slide.getElementsByClassName("edgeCountMatches")[0]
       check.labels[0].innerText = "Edge count is " + edges.length + "?"
       cyCaller.get("/v1/networks/" + suid + "/nodes", function(nodes){
         nodes = JSON.parse(nodes)
         log("Nodes in galfiltered = " + nodes.length, "response")
-        addResponse("galfiltered", {'cyrestNodeCount': nodes.length,
+        addResponse(slide.id, {'cyrestNodeCount': nodes.length,
                                     'cyrestEdgeCount': edges.length})
         
-        const check = currentSlide.getElementsByClassName("nodeCountMatches")[0]
+        const check = slide.getElementsByClassName("nodeCountMatches")[0]
         check.labels[0].innerText = "Node count is " + nodes.length + "?"
         showControls();
       });
@@ -44,7 +43,7 @@ function galfiltered(){
   });
 }
 
-function diffusion(){
+function diffusion(slide){
   const select_nodes = (suid, node_suids) => {
     cyCaller.put("/v1/networks/"+ suid + "/nodes/selected", node_suids, function(){
       cyCaller.post("/diffusion/v1/currentView/diffuse", {}, () => {
@@ -66,7 +65,7 @@ function diffusion(){
   });
 }
 
-function layout(){
+function layout(slide){
   const url = "http://chianti.ucsd.edu/~bsettle/galFiltered.cx"
   cyCaller.load_file_from_url(url, function(suid){
     cyCaller.get("/v1/apply/layouts/circular/" + suid, 
@@ -120,20 +119,21 @@ function initDropArea(){
   return dropArea;
 }
 
-function session_save(){
+function session_save(slide){
   const url = "http://chianti.ucsd.edu/~bsettle/galFiltered.cx"
   cyCaller.load_file_from_url(url, function(suid){
     cyCaller.post("/v1/session?file=", {}, (loc) => {
       loc = JSON.parse(loc)['file']
-      const text = currentSlide.getElementsByClassName('text')[0]
+      const text = slide.getElementsByClassName('text')[0]
       text.innerText = "Saved session file to " + loc + ".cys"
       
       initDropArea();
+      showControls();
     })
  })
 }
 
-function summary(){
+function runjasmine(slide){
   log(JSON.stringify(window.DATA['responses']))
   window.runtests();
 }
@@ -201,26 +201,32 @@ function buildSlide(options, container){
   container.innerHTML = slide;
 }
 
-function clearSession(callback){
+function clearSession(callback, slide){
   cyCaller.delete("/v1/session", {}, function(r){
-    callback();
+    callback(slide);
   })
 }
 
-function call(id){
+function call(slide){
   const funcs = {
     "tester": tester,
     "close_session": close_session,
-    "galfiltered": () => { clearSession(galfiltered) },
-    "diffusion": () => { clearSession(diffusion) },
-    "layout": () => { clearSession(layout) },
-    "session_save": () => { clearSession(session_save) },
-    "summary": summary
+    "galfiltered": galfiltered,
+    "diffusion": diffusion,
+    "layout": layout,
+    "session_save": session_save,
+    // "galfiltered": (v) => { clearSession(galfiltered, v) },
+    // "diffusion": (v) => { clearSession(diffusion, v) },
+    // "layout": (v) => { clearSession(layout, v) },
+    // "session_save": (v) => { clearSession(session_save, v) },
+    "runjasmine": runjasmine
   }
   
   log("Starting test", "init", true)
-  if (funcs.hasOwnProperty(id)){
-    funcs[id]()
+  if (funcs.hasOwnProperty(slide.id)){
+    Reveal.configure({controls: false})
+    funcs[slide.id](slide)
+    setTimeout(() => { Reveal.configure({controls: true}) }, 5000)
   }else {
     showControls()
   }
@@ -248,7 +254,8 @@ function save_answers(slide){
 
 function showControls(vis=true){
   // TODO: How to handle errors that prevent this from being called?
-  // Reveal.configure({controls: vis})
+  // A timer was placed in the slide call func
+  Reveal.configure({controls: vis})
 }
 
 Reveal.initialize({
@@ -281,10 +288,10 @@ Reveal.initialize({
 
 Reveal.addEventListener( 'slidechanged', function( event ) {
 	// event.previousSlide, event.currentSlide, event.indexh, event.indexv
+  console.log(event)
   currentSlide = event.currentSlide;
-  showControls(false)
   save_answers(event.previousSlide)
-  call(event.currentSlide.id)
+  call(event.currentSlide)
 });
 
 const cyCaller = new CyCaller();
