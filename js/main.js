@@ -1,6 +1,9 @@
 window.DATA = { 'log': [], 'responses': {} }
 
-const logArea = document.getElementsByTagName('textarea')[0]
+function toggleLog () {
+  const log = document.getElementById('log-container')
+  log.style.display = log.style.display === 'none' ? 'block' : 'none'
+}
 
 function tester (slide) {
   addResponse(slide.id, { 'appVersion': window.navigator['appVersion'] })
@@ -17,17 +20,17 @@ function close_session (slide) {
 function galfiltered (slide) {
   const url = 'http://chianti.ucsd.edu/~bsettle/galFiltered.cx'
   cyCaller.load_file_from_url(url, function (suid) {
-    this.log(slide, 'Loaded galfiltered with SUID ' + suid)
+    this.log(slide.id, 'Loaded galfiltered with SUID ' + suid)
     cyCaller.get('/v1/networks/' + suid + '/edges', function (edges) {
       edges = JSON.parse(edges)
-      log(slide, 'Edges in galfiltered = ' + edges.length, 'response')
+      log(slide.id, 'Edges in galfiltered = ' + edges.length, 'response')
       addResponse(slide.id)
 
       const check = slide.getElementsByClassName('edgeCountMatches')[0]
       check.labels[0].innerText = 'Edge count is ' + edges.length + '?'
       cyCaller.get('/v1/networks/' + suid + '/nodes', function (nodes) {
         nodes = JSON.parse(nodes)
-        log(slide, 'Nodes in galfiltered = ' + nodes.length, 'response')
+        log(slide.id, 'Nodes in galfiltered = ' + nodes.length, 'response')
         addResponse(slide.id, {
           'cyrestNodeCount': nodes.length,
           'cyrestEdgeCount': edges.length
@@ -132,7 +135,7 @@ function session_save (slide) {
 }
 
 function runjasmine (slide) {
-  log(slide, JSON.stringify(window.DATA['responses']))
+  log(slide.id, JSON.stringify(window.DATA['responses']))
   window.runtests()
 }
 
@@ -144,26 +147,12 @@ function addResponse (name, data) {
   window.res = Object.assign(window.DATA.responses[name], data)
 }
 
-function log (slide, message, type = 'info', clear = false) {
-  let context = 'log';
-  if (slide && slide.id) {
-    context = slide.id
-  }
-
+function log (context, message, type = 'info', clear = false) {
   const line = context + '::' + type + ' - ' + message
   window.DATA['log'].push(line)
-  logArea.innerHTML = window.DATA['log'].join('\n')
-  logArea.scrollTop = logArea.scrollHeight
-  if (slide) {
-    const log = slide.getElementsByClassName('slide_log')[0]
-    if (log) {
-      if (clear) {
-        log.innerHTML = ''
-      }
-      log.innerHTML += message + '\n'
-      log.scrollTop = log.scrollHeight
-    }
-  }
+  const log = document.getElementById('log')
+  log.innerHTML = window.DATA['log'].join('\n')
+  log.scrollTop = log.scrollHeight
 }
 
 function buildInput (n) {
@@ -184,9 +173,6 @@ function buildSlide (options, container) {
   var slide = '<h3>' + options.title + '</h3>'
   if (options.text) {
     slide += "<p class='text'>" + options.text + '</p>'
-  }
-  if (!options.hasOwnProperty('log') || options['log'] !== 'false') {
-    slide += '<textarea class="slide_log" readonly></textarea>'
   }
   slide += '<div class="entries" id="entries">'
   if (options.inputs) {
@@ -209,18 +195,18 @@ function call (slide) {
   const funcs = {
     'tester': tester,
     'close_session': close_session,
-    'galfiltered': galfiltered,
-    'diffusion': diffusion,
-    'layout': layout,
-    'session_save': session_save,
-    // 'galfiltered': (v) => { clearSession(galfiltered, v) },
-    // 'diffusion': (v) => { clearSession(diffusion, v) },
-    // 'layout': (v) => { clearSession(layout, v) },
-    // 'session_save': (v) => { clearSession(session_save, v) },
+    // 'galfiltered': galfiltered,
+    // 'diffusion': diffusion,
+    // 'layout': layout,
+    // 'session_save': session_save,
+    'galfiltered': (v) => { clearSession(galfiltered, v) },
+    'diffusion': (v) => { clearSession(diffusion, v) },
+    'layout': (v) => { clearSession(layout, v) },
+    'session_save': (v) => { clearSession(session_save, v) },
     'runjasmine': runjasmine
   }
 
-  log(slide, 'Starting test', 'init', true)
+  log(slide.id, 'Starting test', 'init', true)
   if (funcs.hasOwnProperty(slide.id)) {
     Reveal.configure({ controls: false })
     funcs[slide.id](slide)
@@ -289,4 +275,4 @@ Reveal.addEventListener('slidechanged', function (event) {
 
 const cyCaller = new CyCaller()
 cyCaller.setLogCallBack(log)
-log(null, 'Started Cytoscape Testing')
+log('log', 'Started Cytoscape Testing')
