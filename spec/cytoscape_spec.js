@@ -104,7 +104,7 @@ describe("Cytoscape", function() {
   
   it("save session size", function(){
     const fileSize = window.DATA.responses['session_save']['file_size']
-    expect(fileSize).toBeGreaterThan(200000);
+    expect(fileSize).toBeGreaterThan(60000);
   })
   // TODO: further automated testing...
   
