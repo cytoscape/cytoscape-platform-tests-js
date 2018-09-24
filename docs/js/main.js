@@ -7,13 +7,13 @@ function toggleLog () {
 
 function tester (slide) {
   addResponse(slide.id, { 'appVersion': window.navigator['appVersion'] })
-  showControls()
+  showControls(slide)
 }
 
 /* SLIDES */
 function close_session (slide) {
   cyCaller.delete('/v1/session', {}, function (r) {
-    showControls()
+    showControls(slide)
   })
 }
 
@@ -38,7 +38,7 @@ function galfiltered (slide) {
 
         const check = slide.getElementsByClassName('nodeCountMatches')[0]
         check.labels[0].innerText = 'Node count is ' + nodes.length + '?'
-        showControls()
+        showControls(slide)
       })
     })
   })
@@ -48,7 +48,7 @@ function diffusion (slide) {
   const select_nodes = (suid, node_suids) => {
     cyCaller.put('/v1/networks/' + suid + '/nodes/selected', node_suids, function () {
       cyCaller.post('/diffusion/v1/currentView/diffuse', {}, () => {
-        showControls()
+        showControls(slide)
       })
     })
   }
@@ -71,7 +71,7 @@ function layout (slide) {
   cyCaller.load_file_from_url(url, function (suid) {
     cyCaller.get('/v1/apply/layouts/circular/' + suid,
       function () {
-        showControls()
+        showControls(slide)
       })
   })
 }
@@ -129,14 +129,15 @@ function session_save (slide) {
       text.innerText = 'Saved session file to ' + loc + '.cys'
 
       initDropArea()
-      showControls()
+      showControls(slide)
     })
   })
 }
 
 function runjasmine (slide) {
-  log(slide.id, JSON.stringify(window.DATA['responses']))
-  window.runtests()
+  log(slide.id, JSON.stringify(window.DATA['responses']));
+  window.runtests();
+  showControls(slide);
 }
 
 /* HELPERS */
@@ -174,7 +175,8 @@ function buildSlide (options, container) {
   if (options.text) {
     slide += "<p class='text'>" + options.text + '</p>'
   }
-  slide += '<div class="entries" id="entries">'
+  slide += '<div class="preload" id="preload" style="display: block;">Preparing test<br><img src="images/preload.svg" style="border-width:0px;"></img></div>';
+  slide += '<div class="entries" id="entries" style="display: none;">'
   if (options.inputs) {
     for (var n in options.inputs) {
       slide += buildInput(options.inputs[n])
@@ -210,9 +212,9 @@ function call (slide) {
   if (funcs.hasOwnProperty(slide.id)) {
     Reveal.configure({ controls: false })
     funcs[slide.id](slide)
-    setTimeout(() => { Reveal.configure({ controls: true }) }, 5000)
+    setTimeout(() => { Reveal.configure({ controls: true }) }, 10000)
   } else {
-    showControls()
+    showControls(slide)
   }
 }
 
@@ -236,9 +238,17 @@ function save_answers (slide) {
   }
 }
 
-function showControls (vis = true) {
+function showControls (slide, vis = true) {
   // TODO: How to handle errors that prevent this from being called?
   // A timer was placed in the slide call func
+  var preloaddisplay = vis ? "none" : "block";
+  var entriesdisplay = vis ? "block" : "none";
+  if (slide.getElementsByClassName("preload").length > 0) {
+    slide.getElementsByClassName("preload")[0].style.display = preloaddisplay;
+  }
+  if (slide.getElementsByClassName("entries").length > 0) {
+    slide.getElementsByClassName("entries")[0].style.display = entriesdisplay;
+  }
   Reveal.configure({ controls: vis })
 }
 
@@ -262,7 +272,7 @@ Reveal.initialize({
   }],
   controlsBackArrows: 'hidden',
   controlsTutorial: false,
-  progress: true, // TODO: change to false to prevent backstepping
+  progress: false,
   keyboard: false,
   overview: false
 })
