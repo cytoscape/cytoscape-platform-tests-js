@@ -1,5 +1,7 @@
 window.DATA = { 'log': [], 'responses': {} }
 
+const GALFILTERED = 'https://raw.githubusercontent.com/BrettJSettle/cytoscape-platform-tests-js/master/networks/galFiltered.cx'
+
 function toggleLog () {
   const log = document.getElementById('log-container')
   log.style.display = log.style.display === 'none' ? 'block' : 'none'
@@ -18,7 +20,7 @@ function close_session (slide) {
 }
 
 function galfiltered (slide) {
-  const url = 'http://chianti.ucsd.edu/~bsettle/galFiltered.cx'
+  const url = GALFILTERED
   cyCaller.load_file_from_url(url, function (suid) {
     this.log(slide.id, 'Loaded galfiltered with SUID ' + suid)
     cyCaller.get('/v1/networks/' + suid + '/edges', function (edges) {
@@ -52,7 +54,7 @@ function diffusion (slide) {
       })
     })
   }
-  const url = 'http://chianti.ucsd.edu/~bsettle/galFiltered.cx'
+  const url = GALFILTERED
   cyCaller.load_file_from_url(url, function (suid) {
     cyCaller.get('/v1/networks/' + suid + '/tables/defaultnode/rows', function (r) {
       const rows = JSON.parse(r)
@@ -67,7 +69,7 @@ function diffusion (slide) {
 }
 
 function layout (slide) {
-  const url = 'http://chianti.ucsd.edu/~bsettle/galFiltered.cx'
+  const url = GALFILTERED
   cyCaller.load_file_from_url(url, function (suid) {
     cyCaller.get('/v1/apply/layouts/circular/' + suid,
       function () {
@@ -121,7 +123,7 @@ function initDropArea () {
 }
 
 function session_save (slide) {
-  const url = 'http://chianti.ucsd.edu/~bsettle/galFiltered.cx'
+  const url = GALFILTERED
   cyCaller.load_file_from_url(url, function (suid) {
     cyCaller.post('/v1/session?file=', {}, (loc) => {
       loc = JSON.parse(loc)['file']
@@ -135,9 +137,19 @@ function session_save (slide) {
 }
 
 function runjasmine (slide) {
-  log(slide.id, JSON.stringify(window.DATA['responses']));
-  window.runtests();
-  showControls(slide);
+  log(slide.id, JSON.stringify(window.DATA['responses']))
+
+  const testDiv = document.getElementById('tests')
+  testDiv.style.position = 'absolute'
+  testDiv.style.zIndex = 200
+  testDiv.style.bottom = 0
+  testDiv.style.height = '50%'
+
+  const revealContainer = document.getElementById('reveal-container')
+  revealContainer.style.height = '50%'
+
+  window.runtests()
+  showControls(slide)
 }
 
 /* HELPERS */
@@ -175,7 +187,7 @@ function buildSlide (options, container) {
   if (options.text) {
     slide += "<p class='text'>" + options.text + '</p>'
   }
-  slide += '<div class="preload" id="preload" style="display: block;">Preparing test<br><img src="images/preload.svg" style="border-width:0px;"></img></div>';
+  slide += '<div class="preload" id="preload" style="display: block;">Preparing test<br><img src="images/preload.svg" style="border-width:0px;  background: none;"></img></div>'
   slide += '<div class="entries" id="entries" style="display: none;">'
   if (options.inputs) {
     for (var n in options.inputs) {
