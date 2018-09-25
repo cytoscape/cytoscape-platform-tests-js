@@ -39,8 +39,12 @@ class CyCaller {
     Http.setRequestHeader('Accept', 'application/json')
     Http.send(data)
     Http.onreadystatechange = (e) => {
-      if (Http.readyState === 4 && Http.status === 200) {
-        callback(Http.responseText)
+      if (Http.readyState === 4) {
+				const resp = Http.responseText
+				if (this.log){
+					this.log(resp.substr(0, 300) + '...', 'response')
+				}
+        callback(resp)
       }
     }
   }
@@ -52,9 +56,9 @@ class CyCaller {
     const hasData = (data instanceof Array && data.length > 0) || (data instanceof Object && Object.keys(data).length !== 0)
     var url = this.cy_rest_instance.base_url + ':' + this.cy_rest_instance.port + endpoint
     if (this.log) {
-      this.log('log', http_method.toUpperCase() + ' ' + url, 'call')
+      this.log(http_method.toUpperCase() + ' ' + url, 'call')
       if (hasData) {
-        this.log('log', 'data=' + JSON.stringify(data))
+        this.log('data=' + JSON.stringify(data), 'call')
       }
     }
 

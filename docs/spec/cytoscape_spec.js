@@ -1,22 +1,29 @@
 describe("Cytoscape", function() {
 
   beforeAll(function() {
-    console.log(window.DATA.responses);
+    // console.log(window.DATA.responses);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
   });
 
   beforeEach(function() {
 
   });
+	afterAll(function() {
+		setTimeout(() => {
+			addResponse('runjasmine', {'results': window.tests.innerText})
+			console.log(window.DATA.responses)
+			showControls(document.getElementById('runjasmine'))
+		}, 1000)
+	})
 
   it("check status", function(done) {
     var testValue = window.DATA.responses["status"];
-    var expectedValue = { 
+    var expectedValue = {
       allAppsStarted: true,
       apiVersion: 'v1'
     };
     cyCaller.get("/v1", function(v){
-      log(v)
+      log(v, "status")
       v = JSON.parse(v)
       data = {"allAppsStarted": v['allAppsStarted'], "apiVersion": v['apiVersion']}
       expect(data).toEqual(expectedValue);
@@ -25,18 +32,18 @@ describe("Cytoscape", function() {
   });
 
   it("check version", function(done) {
-    var expectedValue = { 
+    var expectedValue = {
       cytoscapeVersion: '3.7.0-SNAPSHOT',
       apiVersion: 'v1'
     };
     cyCaller.get("/v1/version", function(v){
-      log(v)
+      log(v, "version")
       v = JSON.parse(v)
       expect(v).toEqual(expectedValue);
       done();
     });
   });
-  
+
   it("check close session", function(){
     const value = window.DATA.responses['close_session'];
     const expectedValue = {new_session: true};

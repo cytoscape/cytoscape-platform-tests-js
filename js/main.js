@@ -22,17 +22,17 @@ function close_session (slide) {
 function galfiltered (slide) {
   const url = GALFILTERED
   cyCaller.load_file_from_url(url, function (suid) {
-    this.log(slide.id, 'Loaded galfiltered with SUID ' + suid)
+    log('Loaded galfiltered with SUID ' + suid, slide.id)
     cyCaller.get('/v1/networks/' + suid + '/edges', function (edges) {
       edges = JSON.parse(edges)
-      log(slide.id, 'Edges in galfiltered = ' + edges.length, 'response')
+      log('Edges in galfiltered = ' + edges.length, slide.id)
       addResponse(slide.id)
 
       const check = slide.getElementsByClassName('edgeCountMatches')[0]
       check.labels[0].innerText = 'Edge count is ' + edges.length + '?'
       cyCaller.get('/v1/networks/' + suid + '/nodes', function (nodes) {
         nodes = JSON.parse(nodes)
-        log(slide.id, 'Nodes in galfiltered = ' + nodes.length, 'response')
+        log('Nodes in galfiltered = ' + nodes.length, slide.id)
         addResponse(slide.id, {
           'cyrestNodeCount': nodes.length,
           'cyrestEdgeCount': edges.length
@@ -123,21 +123,31 @@ function initDropArea () {
 }
 
 function session_save (slide) {
-  const url = GALFILTERED
-  cyCaller.load_file_from_url(url, function (suid) {
-    cyCaller.post('/v1/session?file=', {}, (loc) => {
-      loc = JSON.parse(loc)['file']
-      const text = slide.getElementsByClassName('text')[0]
-      text.innerText = 'Saved session file to ' + loc + '.cys'
+  const post_save = (loc) => {
+		const text = slide.getElementsByClassName('text')[0]
+		text.innerText = 'Saved session file to ' + loc + '.cys'
 
-      initDropArea()
-      showControls(slide)
-    })
+		initDropArea()
+		showControls(slide)
+	}
+	const url = GALFILTERED
+  cyCaller.load_file_from_url(url, function (suid) {
+    cyCaller.get('/v1/session?file=//', (loc) => {
+      loc = JSON.parse(loc)
+			if (loc.hasOwnProperty('errors')){
+				path = loc['errors'][0]['link']
+				loc = path.substr(5, path.lastIndexOf('.')-5)
+    		cyCaller.post('/v1/session?file=' + loc, {}, (loc2) => {
+					loc2 = JSON.parse(loc2)['file']
+					post_save(loc2)
+				})
+			}
+		})
   })
 }
 
 function runjasmine (slide) {
-  log(slide.id, JSON.stringify(window.DATA['responses']))
+  log(JSON.stringify(window.DATA['responses']), slide.id)
 
   const testDiv = document.getElementById('tests')
   testDiv.style.position = 'absolute'
@@ -149,7 +159,6 @@ function runjasmine (slide) {
   revealContainer.style.height = '50%'
 
   window.runtests()
-  showControls(slide)
 }
 
 /* HELPERS */
@@ -160,8 +169,8 @@ function addResponse (name, data) {
   window.res = Object.assign(window.DATA.responses[name], data)
 }
 
-function log (context, message, type = 'info', clear = false) {
-  const line = context + '::' + type + ' - ' + message
+function log (message, context = 'info') {
+  const line = context + ' :: ' + message
   window.DATA['log'].push(line)
   const log = document.getElementById('log')
   log.innerHTML = window.DATA['log'].join('\n')
@@ -209,10 +218,6 @@ function call (slide) {
   const funcs = {
     'tester': tester,
     'close_session': close_session,
-    // 'galfiltered': galfiltered,
-    // 'diffusion': diffusion,
-    // 'layout': layout,
-    // 'session_save': session_save,
     'galfiltered': (v) => { clearSession(galfiltered, v) },
     'diffusion': (v) => { clearSession(diffusion, v) },
     'layout': (v) => { clearSession(layout, v) },
@@ -220,7 +225,7 @@ function call (slide) {
     'runjasmine': runjasmine
   }
 
-  log(slide.id, 'Starting test', 'init', true)
+  log('Starting slide', slide.id)
   if (funcs.hasOwnProperty(slide.id)) {
     Reveal.configure({ controls: false })
     funcs[slide.id](slide)
@@ -251,17 +256,18 @@ function save_answers (slide) {
 }
 
 function showControls (slide, vis = true) {
-  // TODO: How to handle errors that prevent this from being called?
-  // A timer was placed in the slide call func
-  var preloaddisplay = vis ? "none" : "block";
+	var preloaddisplay = vis ? "none" : "block";
   var entriesdisplay = vis ? "block" : "none";
-  if (slide.getElementsByClassName("preload").length > 0) {
-    slide.getElementsByClassName("preload")[0].style.display = preloaddisplay;
-  }
-  if (slide.getElementsByClassName("entries").length > 0) {
-    slide.getElementsByClassName("entries")[0].style.display = entriesdisplay;
-  }
-  Reveal.configure({ controls: vis })
+	if (slide.getElementsByClassName("preload").length > 0) {
+		slide.getElementsByClassName("preload")[0].style.display = preloaddisplay;
+	}
+	if (slide.getElementsByClassName("entries").length > 0) {
+		slide.getElementsByClassName("entries")[0].style.display = entriesdisplay;
+	}
+	if (slide.id === 'runjasmine'){
+		addResponse(slide.id, {'results': window.tests.innerText})
+	}
+	Reveal.configure({ controls: vis })
 }
 
 Reveal.initialize({
@@ -297,4 +303,4 @@ Reveal.addEventListener('slidechanged', function (event) {
 
 const cyCaller = new CyCaller()
 cyCaller.setLogCallBack(log)
-log('log', 'Started Cytoscape Testing')
+log('Started Cytoscape Testing', 'init')
