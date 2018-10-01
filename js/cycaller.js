@@ -42,7 +42,7 @@ class CyCaller {
       if (Http.readyState === 4) {
 				const resp = Http.responseText
 				if (this.log){
-					this.log(resp.substr(0, 300) + '...', 'response')
+					this.log(resp.length > 0 ? resp.substr(0, 300) + '...' : "None", 'response')
 				}
         callback(resp)
       }
