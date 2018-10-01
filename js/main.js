@@ -174,8 +174,8 @@ function log (message, context = 'info') {
   console.log(line)
   // const log = document.getElementById('log')
   // window.DATA['log'].push(line)
-	//log.innerHTML = window.DATA['log'].join('\n')
-  //log.scrollTop = log.scrollHeight
+	// log.innerHTML = window.DATA['log'].join('\n')
+  // log.scrollTop = log.scrollHeight
 }
 
 function buildInput (n) {
