@@ -1,6 +1,6 @@
 window.DATA = { 'responses': {} }
 
-const GALFILTERED = 'https://raw.githubusercontent.com/BrettJSettle/cytoscape-platform-tests-js/master/networks/galFiltered.cx'
+const GALFILTERED = 'https://raw.githubusercontent.com/cytoscape/cytoscape-platform-tests-js/master/networks/galFiltered.cx'
 
 function toggleLog () {
   const log = document.getElementById('log-container')
