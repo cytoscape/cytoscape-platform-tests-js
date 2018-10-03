@@ -39,10 +39,10 @@ class CyCaller {
     Http.setRequestHeader('Accept', 'application/json')
     Http.send(data)
     Http.onreadystatechange = (e) => {
-      if (Http.readyState === 4) {
+      if (Http.readyState === 4) {        
 				const resp = Http.responseText
 				if (this.log){
-					this.log(resp.length > 0 ? resp.substr(0, 300) + '...' : "None", 'response')
+					this.log(resp.substr(0, 300) + '...', 'response')
 				}
         callback(resp)
       }

@@ -30,32 +30,38 @@
   </script>
 </head>
   <body>
+    <div id="log-div">
+      <div id="log-button-container">
+        <input type="button" id="log-button" onClick="toggleLog()" value="LOG"/>
+      </div>
+      <div id="log-container" style="display:none">
+        <textarea id="log"></textarea>
+      </div>
+    </div>
   <div id="reveal-container" style="width: 100%; height: 100%">
   <div class="reveal">
     <div class="slides">
       <section id="init">
-          <h2>Cytoscape Testing</h2>
-          <p>Thank you for helping improve the Cytoscape experience.
-            Use the arrow at the bottom to step through tests.</p>
+          <div class="cyrest">
+            <!--{
+              "title": "Cytoscape Testing",
+              "text": "Thank you for helping improve the Cytoscape experience. Use the arrow at the bottom to step through tests.",
+              "inputs": [
+                {"id": "name",
+                "text": "Name",
+                "type": "text"
+                },
+                {"id": "os",
+                "text": "Operating System",
+                "type": "text"
+                }]
+            }-->
+          </div>
       </section>
       <section id="install">
         <h2>Download the Cytoscape Milestone Release</h2>
         <a href="https://github.com/cytoscape/cytoscape-gui-distribution/releases" target="_blank"><u>Go to Github Releases</u></a>
-        <p>Once the download completes, run the installer (or shell script for UNIX).</p>
-        <p>For testing purposes, it is helpful to start Cytoscape via the terminal. To do this,
-        cd to your Cytoscape install location and run cytoscape.sh (or cytoscape.bat on Windows)</p>
-      </section>
-      <section id="tester">
-        <div class="cyrest">
-          <!--{
-          "title": "Tester Information",
-          "inputs": [
-            {"id": "name",
-            "text": "Name",
-            "type": "text"
-            }]
-        }-->
-        </div>
+        <p>The installer should create an executable for you.</p>
       </section>
       <section id="close_session">
         <div class="cyrest">
@@ -123,7 +129,7 @@
         <div id="drop-area" style="visibility: hidden">
           <form class="drop-form">
             <p>Drag the .cys file onto the dashed area</p>
-            <input type="file" id="fileElem" accept=".cys" onchange="handleCYS(this.parentElement.parentElement, this.files)">
+            <input type="file" class="fileBtn" id="fileElem" accept=".cys" onchange="handleCYS(this.parentElement.parentElement, this.files)">
             <label class="button" for="fileElem">Select CYS</label>
           </form>
         </div>
@@ -136,14 +142,38 @@
           }-->
         </div>
       </section>
+      <section id="user_feedback">
+        <div class="cyrest">
+          <!--{
+          "title": "Go through personal workflows!",
+          "text": "Ensure everything works as you expect.",
+          "inputs": [{
+            "id" : "feedback",
+            "type" : "textarea",
+            "text" : "Feedback"}
+            ]
+          }-->
+        </div>
+      </section>
+      <section id="close_cytoscape">
+        <h2>Thanks for testing Cytoscape!</h2>
+        <p class="text"></p>
+        <div id="drop-area">
+          <form class="drop-form">
+            <p>Submit your framework.log file</p>
+            <input type="file" class="fileBtn" id="logElem" accept=".log" onchange="handleLog(this.parentElement.parentElement, this.files)">
+            <label class="button" for="logElem">Select .log</label>
+          </form>
+        </div>
+      </section>
     </div>
   </div>
 </div>
   <div id="tests">
-    </div>
-    <script src="lib/js/head.min.js"></script>
-    <script src="js/reveal.js"></script>
-    <script src="js/main.js"></script>
+  </div>
+  <script src="lib/js/head.min.js"></script>
+  <script src="js/reveal.js"></script>
+  <script src="js/main.js"></script>
 </body>
 
 </html>

@@ -11,8 +11,8 @@ describe("Cytoscape", function() {
 	afterAll(function() {
 		setTimeout(() => {
 			addResponse('runjasmine', {'results': window.tests.innerText})
-			console.log(JSON.stringify(window.DATA.responses))
 			showControls(document.getElementById('runjasmine'))
+
 		}, 1000)
 	})
 

@@ -1,4 +1,4 @@
-window.DATA = { 'responses': {} }
+window.DATA = { 'log': [], 'responses': {} }
 
 const GALFILTERED = 'https://raw.githubusercontent.com/cytoscape/cytoscape-platform-tests-js/master/networks/galFiltered.cx'
 
@@ -7,7 +7,7 @@ function toggleLog () {
   log.style.display = log.style.display === 'none' ? 'block' : 'none'
 }
 
-function tester (slide) {
+function init (slide) {
   addResponse(slide.id, { 'appVersion': window.navigator['appVersion'] })
   showControls(slide)
 }
@@ -83,8 +83,8 @@ function handleCYS (area, files) {
   area.style.backgroundColor = '#669166'
 }
 
-function initDropArea () {
-  const dropArea = document.getElementById('drop-area')
+function initDropArea (id) {
+  const dropArea = document.getElementById(id)
   dropArea.style.visibility = 'visible'
 
   ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -125,9 +125,9 @@ function initDropArea () {
 function session_save (slide) {
   const post_save = (loc) => {
 		const text = slide.getElementsByClassName('text')[0]
-		text.innerText = 'Saved session file to ' + loc + '.cys'
+    text.innerText = 'Saved session file to ' + loc + '.cys'
 
-		initDropArea()
+		initDropArea('drop-area')
 		showControls(slide)
 	}
 	const url = GALFILTERED
@@ -135,7 +135,8 @@ function session_save (slide) {
     cyCaller.get('/v1/session?file=//', (loc) => {
       loc = JSON.parse(loc)
 			if (loc.hasOwnProperty('errors')){
-				path = loc['errors'][0]['link']
+        path = loc['errors'][0]['link']
+        window.logFilePath = path
 				loc = path.substr(5, path.lastIndexOf('.')-5)
     		cyCaller.post('/v1/session?file=' + loc, {}, (loc2) => {
 					loc2 = JSON.parse(loc2)['file']
@@ -146,22 +147,63 @@ function session_save (slide) {
   })
 }
 
+function toggle_tests(vis){
+  const testDiv = document.getElementById('tests')
+  const revealContainer = document.getElementById('reveal-container')
+
+  if (vis){
+    testDiv.style.position = 'absolute'
+    testDiv.style.zIndex = 200
+    testDiv.style.bottom = 0
+    testDiv.style.height = '50%'
+    revealContainer.style.height = '50%'
+  }else{
+    revealContainer.style.height = '100%'
+    testDiv.style.height = '0%'
+  }
+}
+
 function runjasmine (slide) {
   log(JSON.stringify(window.DATA['responses']), slide.id)
-
-  const testDiv = document.getElementById('tests')
-  testDiv.style.position = 'absolute'
-  testDiv.style.zIndex = 200
-  testDiv.style.bottom = 0
-  testDiv.style.height = '50%'
-
-  const revealContainer = document.getElementById('reveal-container')
-  revealContainer.style.height = '50%'
-
   window.runtests()
 }
 
+function feedback(slide){
+  setTimeout(() => { showControls(slide) }, 500 )
+}
+
+function close_cytoscape_slide(slide){
+  setTimeout(() => { showControls(slide) }, 500)
+  const text = slide.getElementsByClassName('text')[0]
+  if (window.logFilePath){
+    text.innerText = "Load log file from " + window.logFilePath
+  }else{
+    text.innerHTML = "Default location is in your Home Directory, at <br/>~/CytoscapeConfiguration/3/framework.log"
+  }
+}
+
 /* HELPERS */
+function handleLog(form, files){
+  const reader = new FileReader()
+  reader.onload = (f) => {
+    var element = document.createElement('p')
+    const text = '--- REVEAL.JS ---\n' + window.DATA.log.join('\n') +
+      '\n--- Cytoscape Log ---\n' + reader.result
+    element.style = 'font-size: 22px'
+    element.innerHTML = '<a href="data:text/plain;charset=utf-8,' + 
+    encodeURIComponent(text) + '" download="Cytoscape_Testing_results.txt">Download testing results</a>' + 
+    '<br/> and <br/>' + 
+    '<a href="https://docs.google.com/forms/d/e/1FAIpQLSd6mqK5yYd7ziRNqL37B5rxf-gI2z2_9oahjvcf-OXBUqOPGQ/viewform">submit them here</a>' + 
+    ' or ' + 
+    '<a target="_blank" href="mailto:bsettle@ucsd.edu">email them to bsettle@ucsd.edu</a></p>'
+    form.remove()
+
+    window.close_cytoscape.appendChild(element)
+  }
+  reader.readAsText(files[0], 'utf-8')
+  console.log(files)
+}
+
 function addResponse (name, data) {
   if (!window.DATA.responses.hasOwnProperty(name)) {
     window.DATA.responses[name] = {}
@@ -171,11 +213,10 @@ function addResponse (name, data) {
 
 function log (message, context = 'info') {
   const line = context + ' :: ' + message
-  console.log(line)
-  // const log = document.getElementById('log')
-  // window.DATA['log'].push(line)
-	// log.innerHTML = window.DATA['log'].join('\n')
-  // log.scrollTop = log.scrollHeight
+  window.DATA['log'].push(line)
+  const log = document.getElementById('log')
+  log.innerHTML = window.DATA['log'].join('\n')
+  log.scrollTop = log.scrollHeight
 }
 
 function buildInput (n) {
@@ -186,6 +227,9 @@ function buildInput (n) {
   } else if (n['type'] === 'text') {
     entry = "<label for='" + n['id'] + "'>" + n['text'] + '</label>' +
       "<input type='text' id='" + n['id'] + "'' name='" + n['id'] + "'/>"
+  } else if (n['type'] === 'textarea') {
+    entry = "<label for='" + n['id'] + "'>" + n['text'] + '</label>' +
+      "<textarea id='" + n['id'] + "'' name='" + n['id'] + "'></textarea>"
   } else {
     entry = "<input type='" + n['type'] + "' id='" + n['id'] + "' class='" + n['id'] + "'/>"
   }
@@ -197,7 +241,9 @@ function buildSlide (options, container) {
   if (options.text) {
     slide += "<p class='text'>" + options.text + '</p>'
   }
-  slide += '<div class="preload" id="preload" style="display: block;">Preparing test<br><img src="images/preload.svg" style="border-width:0px;  background: none;"></img></div>'
+  slide += '<div class="preload" id="preload" style="display: block;">Preparing test<br>' + 
+  '<img src="images/preload.svg" style="border-width:0px;  background: none;"></img>' +
+  '<p style="font-size: 12px">If it takes too long, hit continue</p></div>'
   slide += '<div class="entries" id="entries" style="display: none;">'
   if (options.inputs) {
     for (var n in options.inputs) {
@@ -205,32 +251,38 @@ function buildSlide (options, container) {
     }
   }
   slide += '</div>'
-  // slide += "<p class='result'></p>"
   container.innerHTML = slide
 }
 
-function clearSession (callback, slide) {
+function clearSession (slide, callback) {
   cyCaller.delete('/v1/session', {}, function (r) {
     callback(slide)
   })
 }
 
 function call (slide) {
+  toggle_tests(slide.id === 'runjasmine')
   const funcs = {
-    'tester': tester,
-    'close_session': close_session,
-    'galfiltered': (v) => { clearSession(galfiltered, v) },
-    'diffusion': (v) => { clearSession(diffusion, v) },
-    'layout': (v) => { clearSession(layout, v) },
-    'session_save': (v) => { clearSession(session_save, v) },
-    'runjasmine': runjasmine
+    'init': init,
+    'close_session': (v) => { clearSession(v, showControls) },
+    'galfiltered': (v) => { clearSession(v, galfiltered) },
+    'diffusion': (v) => { clearSession(v, diffusion) },
+    'layout': (v) => { clearSession(v, layout) },
+    'session_save': (v) => { clearSession(v, session_save) },
+    'runjasmine': runjasmine,
+    'user_feedback': feedback,
+    'close_cytoscape': close_cytoscape_slide
   }
 
   log('Starting slide', slide.id)
   if (funcs.hasOwnProperty(slide.id)) {
     Reveal.configure({ controls: false })
-    funcs[slide.id](slide)
-    setTimeout(() => { Reveal.configure({ controls: true }) }, 10000)
+    try{
+      funcs[slide.id](slide)
+      setTimeout(() => { Reveal.configure({ controls: true }) }, 10000)
+    } catch(e){
+      console.log(e)
+    }    
   } else {
     showControls(slide)
   }
@@ -281,7 +333,7 @@ Reveal.initialize({
   ],
   anything: [{
     className: 'cyrest',
-    defaults: { 'name': 'start', 'title': 'Cytoscape Testing' },
+    defaults: { 'title': 'Cytoscape Testing' },
     initialize: function (container, options) {
       if (!options) {
         options = {}
@@ -304,4 +356,5 @@ Reveal.addEventListener('slidechanged', function (event) {
 
 const cyCaller = new CyCaller()
 cyCaller.setLogCallBack(log)
-log('Started Cytoscape Testing', 'init')
+setTimeout(() => { call(Reveal.getSlide(0)) }, 500)
+//log('Started Cytoscape Testing', 'init')
