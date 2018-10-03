@@ -1,4 +1,4 @@
-window.DATA = { 'responses': {} }
+window.DATA = { 'log': [], 'responses': {} }
 
 const GALFILTERED = 'https://raw.githubusercontent.com/cytoscape/cytoscape-platform-tests-js/master/networks/galFiltered.cx'
 
@@ -171,11 +171,10 @@ function addResponse (name, data) {
 
 function log (message, context = 'info') {
   const line = context + ' :: ' + message
-  console.log(line)
-  // const log = document.getElementById('log')
-  // window.DATA['log'].push(line)
-	// log.innerHTML = window.DATA['log'].join('\n')
-  // log.scrollTop = log.scrollHeight
+  window.DATA['log'].push(line)
+  const log = document.getElementById('log')
+  log.innerHTML = window.DATA['log'].join('\n')
+  log.scrollTop = log.scrollHeight
 }
 
 function buildInput (n) {
