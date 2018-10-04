@@ -139,8 +139,13 @@ section#install p{
 #drop-area .button:hover {
   background: #ddd;
 }
-#fileElem, #logElem {
+.fileBtn {
   display: none;
+}
+
+#drop-area > form > p {
+  word-break: break-word;
+  font-size:18px;
 }
 
 /* jasmine */

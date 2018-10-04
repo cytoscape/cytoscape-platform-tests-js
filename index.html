@@ -126,13 +126,6 @@
       <section id="session_save">
         <h2>Session Save</h2>
         <p class="text">Saving Cytoscape session file...</p>
-        <div id="drop-area" style="visibility: hidden">
-          <form class="drop-form">
-            <p>Drag the .cys file onto the dashed area</p>
-            <input type="file" class="fileBtn" id="fileElem" accept=".cys" onchange="handleCYS(this.parentElement.parentElement, this.files)">
-            <label class="button" for="fileElem">Select CYS</label>
-          </form>
-        </div>
       </section>
       <section id="runjasmine">
         <div class="cyrest">
@@ -157,13 +150,14 @@
       </section>
       <section id="close_cytoscape">
         <h2>Thanks for testing Cytoscape!</h2>
-        <p class="text"></p>
-        <div id="drop-area">
-          <form class="drop-form">
-            <p>Submit your framework.log file</p>
-            <input type="file" class="fileBtn" id="logElem" accept=".log" onchange="handleLog(this.parentElement.parentElement, this.files)">
-            <label class="button" for="logElem">Select .log</label>
-          </form>
+        <p class="text">Please submit yout framework.log</p>
+      </section>
+      <section id="submit">
+        <div class="cyrest">
+          <!--{
+            "title": "Submit your testing results",
+            "text": ""
+          }-->
         </div>
       </section>
     </div>

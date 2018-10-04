@@ -78,56 +78,9 @@ function layout (slide) {
   })
 }
 
-function handleCYS (area, files) {
-  addResponse('session_save', { 'file_size': files[0].size })
-  area.style.backgroundColor = '#669166'
-}
-
-function initDropArea (id) {
-  const dropArea = document.getElementById(id)
-  dropArea.style.visibility = 'visible'
-
-  ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    dropArea.addEventListener(eventName, preventDefaults, false)
-  })
-
-  function preventDefaults (e) {
-    e.preventDefault()
-    e.stopPropagation()
-  }
-  ;['dragenter', 'dragover'].forEach(eventName => {
-    dropArea.addEventListener(eventName, highlight, false)
-  })
-
-  ;['dragleave', 'drop'].forEach(eventName => {
-    dropArea.addEventListener(eventName, unhighlight, false)
-  })
-
-  function highlight (e) {
-    dropArea.classList.add('highlight')
-  }
-
-  function unhighlight (e) {
-    dropArea.classList.remove('highlight')
-  }
-  dropArea.addEventListener('drop', handleDrop, false)
-
-  function handleDrop (e) {
-    let dt = e.dataTransfer
-    let files = dt.files
-
-    handleCYS(dropArea, files)
-  }
-
-  return dropArea
-}
-
 function session_save (slide) {
   const post_save = (loc) => {
-		const text = slide.getElementsByClassName('text')[0]
-    text.innerText = 'Saved session file to ' + loc + '.cys'
-
-		initDropArea('drop-area')
+    initDropArea(slide, "cysDrop", 'Saved session file to ' + loc + '.cys', '.cys', handleCYS)
 		showControls(slide)
 	}
 	const url = GALFILTERED
@@ -174,34 +127,130 @@ function feedback(slide){
 
 function close_cytoscape_slide(slide){
   setTimeout(() => { showControls(slide) }, 500)
-  const text = slide.getElementsByClassName('text')[0]
+  let text = "Default location is in your Home Directory, at <br/>~/CytoscapeConfiguration/3/framework.log"
   if (window.logFilePath){
-    text.innerText = "Load log file from " + window.logFilePath
-  }else{
-    text.innerHTML = "Default location is in your Home Directory, at <br/>~/CytoscapeConfiguration/3/framework.log"
+    text = "Load log file from " + window.logFilePath
   }
+  initDropArea(slide, "logDrop", text, '.log', handleLog)
+}
+
+function submit_slide(slide){
+  showControls(slide)
+  var element = document.createElement('p')
+  text = window.DATA.log.join('\n')
+  
+  element.style = 'font-size: 22px'
+  element.innerHTML = '<a href="data:text/plain;charset=utf-8,' +
+    encodeURIComponent(text) + '" download="Cytoscape_Testing_results.txt">Download testing results</a>' +
+    '<br/> and <br/>' +
+    '<a href="https://docs.google.com/forms/d/e/1FAIpQLSd6mqK5yYd7ziRNqL37B5rxf-gI2z2_9oahjvcf-OXBUqOPGQ/viewform">submit them here</a>' +
+    ' or ' +
+    '<a target="_blank" href="mailto:bsettle@ucsd.edu">email them to bsettle@ucsd.edu</a></p>'
+
+  slide.appendChild(element)
+}
+
+/* File drop area */
+function handleCYS(files) {
+  addResponse('session_save', { 'file_size': files[0].size })
+}
+
+function handleLog(files) {
+  const reader = new FileReader()
+  reader.onload = (f) => {
+    window.DATA.log.push('--- Cytoscape Log ---')
+    window.DATA.log.push(reader.result)
+  }
+  reader.readAsText(files[0], 'utf-8')
+}
+
+function initDropArea(slide, id, text, ext, callback) {
+  const dropArea = document.createElement('div')
+  dropArea.id = 'drop-area'
+  dropArea.className = 'drop-session'
+  const dropForm = document.createElement('form')
+  dropForm.className = 'drop-form'
+  // dropArea.style.visibility = 'hidden'
+  const note = document.createElement('p')
+  note.innerHTML = text
+  const fileBtn = document.createElement('input')
+  fileBtn.type = 'file'
+  fileBtn.className = 'fileBtn'
+  fileBtn.id = id
+  fileBtn.name = id
+  fileBtn.accept = ext
+  fileBtn.onchange = (f) => {
+    dropArea.style.backgroundColor = '#669166'
+    window.f = f; callback(f.target.files)
+  }
+  const label = document.createElement('label')
+  label.className = 'button'
+  label.htmlFor = id
+  label.innerText = "Select " + ext + " file"
+  
+  dropForm.appendChild(note)
+  dropForm.appendChild(fileBtn)
+  dropForm.appendChild(label)
+  dropArea.appendChild(dropForm)
+  slide.appendChild(dropArea)
+  
+  ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, preventDefaults, false)
+  })
+
+  function preventDefaults(e) {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+  ;['dragenter', 'dragover'].forEach(eventName => {
+    dropArea.addEventListener(eventName, highlight, false)
+  })
+
+  ;['dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, unhighlight, false)
+  })
+
+  function highlight(e) {
+    dropArea.classList.add('highlight')
+  }
+
+  function unhighlight(e) {
+    dropArea.classList.remove('highlight')
+  }
+  dropArea.addEventListener('drop', handleDrop, false)
+
+
+  function handleDrop(e) {
+    let dt = e.dataTransfer
+    let files = dt.files
+    if (files.length < 1 || !files[0].name.endsWith(ext)){
+      alert("Only " + ext + " files are supported")
+      return
+    }
+    dropArea.style.backgroundColor = '#669166'
+    callback(files)
+  }
+
+  return dropArea
 }
 
 /* HELPERS */
-function handleLog(form, files){
-  const reader = new FileReader()
-  reader.onload = (f) => {
-    var element = document.createElement('p')
-    const text = '--- REVEAL.JS ---\n' + window.DATA.log.join('\n') +
-      '\n--- Cytoscape Log ---\n' + reader.result
-    element.style = 'font-size: 22px'
-    element.innerHTML = '<a href="data:text/plain;charset=utf-8,' + 
-    encodeURIComponent(text) + '" download="Cytoscape_Testing_results.txt">Download testing results</a>' + 
-    '<br/> and <br/>' + 
-    '<a href="https://docs.google.com/forms/d/e/1FAIpQLSd6mqK5yYd7ziRNqL37B5rxf-gI2z2_9oahjvcf-OXBUqOPGQ/viewform">submit them here</a>' + 
-    ' or ' + 
-    '<a target="_blank" href="mailto:bsettle@ucsd.edu">email them to bsettle@ucsd.edu</a></p>'
-    form.remove()
-
-    window.close_cytoscape.appendChild(element)
+function showResultSubmit(text){
+  const form = Reveal.getCurrentSlide().getElementsByTagName('form')[0]
+  var element = document.createElement('p')
+  if (text === null){
+    text = '--- REVEAL.JS ---\n' + window.DATA.log.join('\n')
   }
-  reader.readAsText(files[0], 'utf-8')
-  console.log(files)
+  element.style = 'font-size: 22px'
+  element.innerHTML = '<a href="data:text/plain;charset=utf-8,' +
+    encodeURIComponent(text) + '" download="Cytoscape_Testing_results.txt">Download testing results</a>' +
+    '<br/> and <br/>' +
+    '<a href="https://docs.google.com/forms/d/e/1FAIpQLSd6mqK5yYd7ziRNqL37B5rxf-gI2z2_9oahjvcf-OXBUqOPGQ/viewform">submit them here</a>' +
+    ' or ' +
+    '<a target="_blank" href="mailto:bsettle@ucsd.edu">email them to bsettle@ucsd.edu</a></p>'
+  form.remove()
+
+  window.close_cytoscape.appendChild(element)
 }
 
 function addResponse (name, data) {
@@ -271,7 +320,8 @@ function call (slide) {
     'session_save': (v) => { clearSession(v, session_save) },
     'runjasmine': runjasmine,
     'user_feedback': feedback,
-    'close_cytoscape': close_cytoscape_slide
+    'close_cytoscape': close_cytoscape_slide,
+    'submit': submit_slide
   }
 
   log('Starting slide', slide.id)
