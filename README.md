@@ -88,7 +88,7 @@ To setup a local server and view the reveal.js testing slides that we have creat
 
 1. Clone the repository
    ```sh
-   $ git clone https://github.com/cytoscape/cytoscape-platform-tests-js.git
+   $ git clone https://github.com/Swen670Grp1/cytoscape-platform-tests-js.git
    ```
 
 1. Navigate to the folder
