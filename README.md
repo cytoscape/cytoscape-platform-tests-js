@@ -119,6 +119,8 @@ To setup a local server and view the reveal.js testing slides that we have creat
    ```sh
    $ grunt build
    ```
+### Test Deck Report Log Structure
+TBD
 
 ### Folder Structure
 
