@@ -1297,7 +1297,8 @@
 		}
 
 		if( config.progress && dom.progress ) {
-			dom.progress.addEventListener( 'click', onProgressClicked, false );
+			// Disable the ability to jump slides by clicking on progress bar, uncomment to enable
+			// dom.progress.addEventListener( 'click', onProgressClicked, false );
 		}
 
 		dom.resumeButton.addEventListener( 'click', resume, false );
