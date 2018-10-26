@@ -9,10 +9,11 @@ class BaseTestSlide {
     set uid(newId){
         this._uid = newId;
     }
-    constructor() {
+    constructor(label) {
         if (!TestSlide._id){  TestSlide._id = 0; }  
         TestSlide._id++;
         this._uid = `${this.constructor.name}-${TestSlide._id}`;
+        this._label = label;
     }
     toString(){
         return this.uid;
@@ -22,13 +23,13 @@ class BaseTestSlide {
 class TestSlide extends BaseTestSlide {
     constructor(){
         super();
-        this._label = "";
         this.question = "";
         this.options = [];
         this.steps = [];
         this.answer = "";
         this.userResponse = "";
     }
+
 
     toString(){
         return `\n`+
