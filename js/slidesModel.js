@@ -1,4 +1,3 @@
-const __ = require("lodash");
 /**
  * The base class for Slides.
  */
@@ -63,10 +62,6 @@ class TestSlide extends BaseSlide {
         this.operations = [];
     }
 
-
-
-
-
     toString() {
         return `\n` +
             `\tName: ${this.uid}\n` +
@@ -85,7 +80,7 @@ class TestSlide extends BaseSlide {
      * Starts the test slide and it's operations.
      */
     run() {
-        if (__.isEmpty(this.question)) {
+        if (this.question == null || this.question.trim() === "") {
             return;
         }
         console.debug(`Starting ${this.uid}...`);
@@ -96,13 +91,13 @@ class TestSlide extends BaseSlide {
      * Runs the operations for the current slide.
      */
     runOperations() {
-        if (!__.isArray(this.operations)) {
+        if (this.operations.constructor.name != "Array") {
             return;
         }
         // Running each operation in the test slide.
         let currentOperation = 0;
         console.debug(`\t\tStarting operations for ${this.uid}...`);
-        __.each(this.operations ,operation => {
+        this.operations.forEach(operation => {
             try {
                 currentOperation++;
                 console.debug(`\t\t\tAttempting to run operation ${currentOperation}...`);
@@ -118,10 +113,10 @@ class TestSlide extends BaseSlide {
     /**
      * Adds the passed in function operation to the TestSlide's list of operations.
      * These would get added to the test instance to run.
-     * @param {*} operation 
+     * @param {*} operation function to run
      */
     addTestOperation(operation) {
-        if (__.isFunction(operation)) {
+        if (operation.constructor.name === "Function") {
             this.operations.push(operation);
         } else {
             console.error("An invalid operation was attepted to be added.");
@@ -129,16 +124,55 @@ class TestSlide extends BaseSlide {
     }
 }
 
+/**
+ * Holds the metadata for a test session of the application.
+ */
+class TestSession {
+    constructor() {
+        /**
+         * The id of the session. 
+         */
+        this.sessionId = `${TestSession.constructor.name}-${Math.random().toString().slice(2)}`;
+        this.userInformation = USER_INFO_DEFAULTS;
+    }
+
+    get testSessionId() {
+        return this.sessionId.toString();
+    }
+
+    /**
+     * Opens up the session, performing the necessary steps to set things up.
+     */
+    open(){
+        console.log("Opening session", this.sessionId);
+    }
+
+    /**
+     * Closes and cleans up a test session.
+     */
+    close(){
+        console.log("Closing session", this.sessionId);
+    }
+}
+
+/**
+ * Defaults of the User's information that will be filled in by the user and system.
+ */
+let USER_INFO_DEFAULTS =  {
+    name: null,
+    OS: null,
+}
+
 function main() {
     let slides = [new TestSlide(), new TestSlide(), new TestSlide()];
     slides[0].question = "Starting Test";
     slides[slides.length - 1].question = "Ending Test";
     // console.log("Making slide(s)...", ...slides.toString());
-    __.each(slides,slide => {
+    slides.forEach(slide => {
         console.log("Starting slide...", ...slide.uid);
         slide.run();
     });
 
 }
 
-main();
+// main();
