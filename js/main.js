@@ -8,7 +8,11 @@ function toggleLog () {
 }
 
 function init (slide) {
-  addResponse(slide.id, { 'appVersion': window.navigator['appVersion'] })
+  // define test start time and add to response stack
+  var d = new Date()
+  addResponse(slide.id, { 'test_date': d })
+  // define user environment information: OS and browser version and add to response
+  addResponse(slide.id, { 'user_environment': window.navigator['appVersion'] })
   showControls(slide)
 }
 
@@ -123,6 +127,8 @@ function runjasmine (slide) {
 
 function feedback(slide){
   setTimeout(() => { showControls(slide) }, 500 )
+  
+
 }
 
 function close_cytoscape_slide(slide){
@@ -146,6 +152,42 @@ function submit_slide(slide){
     '<a href="https://docs.google.com/forms/d/e/1FAIpQLSd6mqK5yYd7ziRNqL37B5rxf-gI2z2_9oahjvcf-OXBUqOPGQ/viewform">submit them here</a>' +
     ' or ' +
     '<a target="_blank" href="mailto:bsettle@ucsd.edu">email them to bsettle@ucsd.edu</a></p>'
+
+  slide.appendChild(element)
+}
+
+function submit_jira(slide){
+  var tester = document.getElementById('name').value
+  var env = JSON.stringify(window.DATA['responses'].init.user_environment)
+  var summary = env + ' Tester:' + tester 
+  var uf = document.getElementById('feedback').value
+  addResponse('user_feedback', { 'feedback': uf })
+  log(JSON.stringify(window.DATA['responses']))
+  text1=JSON.stringify(window.DATA['responses'])
+  log('tester name' + document.getElementById('name').value)
+  request_body = {
+    "fields": {
+      "summary": summary,
+      "project": {
+        "id":"projectId"
+      },
+      "issuetype" : {
+        "id":"issueTypeId"
+      }
+    }
+  };
+  
+  log(JSON.stringify(request_body))
+  
+  showControls(slide)
+  var element = document.createElement('p')
+  text = window.DATA.log.join('\n')
+  
+  element.style = 'font-size: 22px'
+  element.innerHTML = '<a href="data:text/plain;charset=utf-8,' +
+    encodeURIComponent(text1) + '" download="Cytoscape_Testing_results.txt">Download testing results</a>' +
+    '<br/> and <br/>' +
+    '<a href="https://docs.google.com/forms/d/e/1FAIpQLSd6mqK5yYd7ziRNqL37B5rxf-gI2z2_9oahjvcf-OXBUqOPGQ/viewform">submit results to Jira</a>' 
 
   slide.appendChild(element)
 }
@@ -257,7 +299,7 @@ function addResponse (name, data) {
   if (!window.DATA.responses.hasOwnProperty(name)) {
     window.DATA.responses[name] = {}
   }
-  window.res = Object.assign(window.DATA.responses[name], data)
+  window.res = Object.assign(window.DATA.responses[name], data )
 }
 
 function log (message, context = 'info') {
@@ -321,7 +363,8 @@ function call (slide) {
     'runjasmine': runjasmine,
     'user_feedback': feedback,
     'close_cytoscape': close_cytoscape_slide,
-    'submit': submit_slide
+    'submit': submit_slide,
+    'submit_jira': submit_jira
   }
 
   log('Starting slide', slide.id)
@@ -330,7 +373,7 @@ function call (slide) {
     Reveal.configure({ controls: false, slideNumber: 'c/t', progress: true })
     try{
       funcs[slide.id](slide)
-      setTimeout(() => { Reveal.configure({ controls: true }) }, 10000)
+      setTimeout(() => { Reveal.configure({ controls: true }) }, 100)
     } catch(e){
       console.log(e)
     }    
