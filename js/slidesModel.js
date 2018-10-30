@@ -145,6 +145,10 @@ class TestSession {
      */
     open(){
         console.log("Opening session", this.sessionId);
+        /**
+         * Time in (ms) that the session was started.
+         */
+        this.startDate = Date.now();
     }
 
     /**
@@ -152,6 +156,10 @@ class TestSession {
      */
     close(){
         console.log("Closing session", this.sessionId);
+        /**
+         * Time in (ms) that the session was started.
+         */
+        this.endDate = Date.now();
     }
 }
 
