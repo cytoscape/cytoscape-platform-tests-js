@@ -2,7 +2,7 @@
  * The base class for Slides.
  */
 class BaseSlide {
-    constructor(label) {
+    constructor(label = DEFAULT_LABEL) {
         if (!BaseSlide._id) { BaseSlide._id = 0; }
         BaseSlide._id++;
         this._uid = `${this.constructor.name}-${BaseSlide._id}`;
@@ -51,7 +51,7 @@ class TestSlide extends BaseSlide {
         /**
          * [Optional] The answer to the question. 
          */
-        this.answer = "";
+        this.expectedAnswer = "";
         /**
          * The user's response to the slide's question.
          */
@@ -169,6 +169,12 @@ class TestSession {
 let USER_INFO_DEFAULTS =  {
     name: null,
     OS: null,
+    browser: null
+}
+
+let DEFAULT_LABEL = {
+    category: "",
+    order: 0 // Opitonal property that specifies the ordering this test will take place.
 }
 
 function main() {
