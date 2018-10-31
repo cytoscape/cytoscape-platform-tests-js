@@ -326,7 +326,8 @@ function call (slide) {
 
   log('Starting slide', slide.id)
   if (funcs.hasOwnProperty(slide.id)) {
-    Reveal.configure({ controls: false })
+    // initialize slide settings for navigation control, current page vs total page, and progress bar
+    Reveal.configure({ controls: false, slideNumber: 'c/t', progress: true })
     try{
       funcs[slide.id](slide)
       setTimeout(() => { Reveal.configure({ controls: true }) }, 10000)
