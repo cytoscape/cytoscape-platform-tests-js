@@ -165,33 +165,81 @@ function submit_jira(slide){
   log(JSON.stringify(window.DATA['responses']))
   text1=JSON.stringify(window.DATA['responses'])
   log('tester name' + document.getElementById('name').value)
-  request_body = {
-    "fields": {
-      "summary": summary,
-      "project": {
-        "id":"projectId"
-      },
-      "issuetype" : {
-        "id":"issueTypeId"
-      }
-    }
-  };
+//   request_data =  {
+//     "fields": {
+//        "project":
+//        {
+//           "key": "CRT"
+//        },
+//        "summary": summary,
+//        "description": "Creating of an issue using project keys and issue type names using the REST API",
+//        "issuetype": {
+//           "name": "RC Testing Report"
+//        }
+//    }
+// };
+request_data = {"jql":"project = CRT","startAt":0,"maxResults":2, "fields":["id","key"]};
   
-  log(JSON.stringify(request_body))
-  
+  report_data= JSON.stringify(request_data)
+
   showControls(slide)
   var element = document.createElement('p')
   text = window.DATA.log.join('\n')
   
   element.style = 'font-size: 22px'
-  element.innerHTML = '<a href="data:text/plain;charset=utf-8,' +
-    encodeURIComponent(text1) + '" download="Cytoscape_Testing_results.txt">Download testing results</a>' +
-    '<br/> and <br/>' +
-    '<a href="https://docs.google.com/forms/d/e/1FAIpQLSd6mqK5yYd7ziRNqL37B5rxf-gI2z2_9oahjvcf-OXBUqOPGQ/viewform">submit results to Jira</a>' 
+  element.innerHTML = '<button type="submit" onclick="SubmitReport()">submit Jira Report</button>' + 
+'<br/>' +
+  '<a href="data:text/plain;charset=utf-8,' +
+    encodeURIComponent(text1) + '" download="Cytoscape_Testing_results.txt">Download testing results</a>' 
+    
+     
 
   slide.appendChild(element)
 }
 
+function make_base_auth(user, password) {
+  var tok = user + ':' + password;
+  var hash = btoa(tok);
+  return "Basic " + hash;
+}  
+
+// function SubmitReport(rdata) {
+//   var xhttp = new XMLHttpRequest();
+//   xhttp.onreadystatechange = function() {
+//        if (this.readyState == 4 && this.status == 200) {
+//            alert(this.responseText);
+//        }
+//   };
+//   xhttp.open("POST", "https://cytoscape.atlassian.net/rest/api/2/search", true);
+//   xhttp.setRequestHeader("Content-type", "application/json");
+//   xhttp.setRequestHeader("Accept", "application/json");
+//   xhttp.setRequestHeader("Bearer", "aXZBhI6AfHNOZjWsTBpx2CE5m");
+//   // xhttp.setRequestHeader("Access-Control-Allow-Origin", "*");
+//   // xhttp.setRequestHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+//   // xhttp.setRequestHeader("Access-Control-Allow-Headers", "Authorization");
+//   xhttp.send(rdata);
+//   log(rdata);
+//   alert(rdata);
+// }
+
+function SubmitReport() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+       if (this.readyState == 4 && this.status == 200) {
+           alert(this.responseText);
+       }
+  };
+  xhttp.open("GET", "https://cytoscape.atlassian.net/rest/api/2/search?jql=key=CRT-1", true);
+  xhttp.setRequestHeader("Content-type", "application/json");
+  xhttp.setRequestHeader("Accept", "application/json");
+  xhttp.setRequestHeader("Bearer", "aXZBhI6AfHNOZjWsTBpx2CE5m");
+  // xhttp.setRequestHeader("Access-Control-Allow-Origin", "*");
+  // xhttp.setRequestHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  // xhttp.setRequestHeader("Access-Control-Allow-Headers", "Authorization");
+  xhttp.send();
+  log(rdata);
+  alert(rdata);
+}
 /* File drop area */
 function handleCYS(files) {
   addResponse('session_save', { 'file_size': files[0].size })
