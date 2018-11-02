@@ -27,14 +27,15 @@ class BaseSlide {
         return this._uid;
     }
 }
+
 /**
  * Class to hold the model of the Test Case. It holds the necessary parts of a test case
  * including, but not limited to: the question, a series of steps, test operations, and
  * the user answer.
  */
 class TestSlide extends BaseSlide {
-    constructor() {
-        super();
+    constructor(label) {
+        super(label);
         /**
          * The question or text for the slide.
          */
@@ -72,8 +73,7 @@ class TestSlide extends BaseSlide {
             `\tUser Response: ${this.userResponse}\n ` +
             `\tCorrect Response: ${this.answer}\n ` +
             `\tResult... ${this.userResponse == this.answer ? "Pass!" : "Fail!"}\n ` +
-            `\n`
-            ;
+            `\n`;
     }
 
     /**
@@ -134,6 +134,7 @@ class TestSession {
          */
         this.sessionId = `${TestSession.constructor.name}-${Math.random().toString().slice(2)}`;
         this.userInformation = USER_INFO_DEFAULTS;
+        this.test_date = new Date().now();
     }
 
     get testSessionId() {
