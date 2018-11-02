@@ -8,6 +8,7 @@ function toggleLog () {
 }
 
 function init (slide) {
+  console.debug("Main init", slide);
   addResponse(slide.id, { 'appVersion': window.navigator['appVersion'] })
   showControls(slide)
 }
