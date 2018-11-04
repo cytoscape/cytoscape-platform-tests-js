@@ -194,22 +194,22 @@ function submit_jira(slide){
   slide.appendChild(element)
 }
 
-function CreateJiraIssue(data) {
-  const Http = new XMLHttpRequest()
-  Http.open("POST", "https://cytoscape.atlassian.net/rest/api/3/issue")
-  Http.setRequestHeader("Content-type", "application/json")
-  Http.setRequestHeader("Accept", "application/json")
-  Http.setRequestHeader("X-Atlassian-Token", "nocheck")
-  Http.setRequestHeader("Authorization", "Basic a291aXNzYXJAZ21haWwuY29tOmppcmFzdWNrcw==")
-  Http.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      alert(this.responseText);
-    }
-  };
-  Http.send(data)
-  alert(data);
-  alert(JSON.stringify(Http.response))
-  }
+// function CreateJiraIssue(data) {
+//   const Http = new XMLHttpRequest()
+//   Http.open("POST", "https://cytoscape.atlassian.net/rest/api/3/issue")
+//   Http.setRequestHeader("Content-type", "application/json")
+//   Http.setRequestHeader("Accept", "application/json")
+//   Http.setRequestHeader("X-Atlassian-Token", "nocheck")
+//   Http.setRequestHeader("Authorization", "Basic a291aXNzYXJAZ21haWwuY29tOmppcmFzdWNrcw==")
+//   Http.onreadystatechange = function() {
+//     if (this.readyState == 4 && this.status == 200) {
+//       alert(this.responseText);
+//     }
+//   };
+//   Http.send(data)
+//   alert(data);
+//   alert(JSON.stringify(Http.response))
+//   }
   
   
   

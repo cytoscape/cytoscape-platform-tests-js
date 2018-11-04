@@ -35,6 +35,13 @@ app.use('/', express.static(testHarnessPath));
 app.use('/api', router);
 // TODO make API for JIRA Log Post Request
 
+function createJiraIssue(data) {
+}
+
+function sendJiraPayload(id){
+
+}
+    
 
 // START THE SERVER
 // =============================================================================
