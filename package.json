@@ -9,7 +9,7 @@
     "test": "grunt test",
     "start": "grunt serve",
     "build": "grunt",
-    "test:classes": "node js/testslide.js"
+    "test:classes": "node js/slides/slidesModel.js"
   },
   "author": {
     "name": "Hakim El Hattab",
@@ -48,6 +48,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "lodash": "^4.17.11"
+    "lodash": "^4.17.11",
+    "ua-parser-js": "^0.7.19"
   }
 }

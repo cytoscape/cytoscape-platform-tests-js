@@ -124,64 +124,6 @@ class TestSlide extends BaseSlide {
     }
 }
 
-/**
- * Holds the metadata for a test session of the application.
- */
-class TestSession {
-    constructor() {
-        /**
-         * The id of the session. 
-         */
-        let ua = UAParser();
-
-        this.sessionId = `${TestSession.constructor.name}-${Math.random().toString().slice(2)}`;
-        this.userInformation = USER_INFO_DEFAULTS;
-        this.test_date = new Date().now();
-        this.userInformation.OS = ua.os;
-        this.userInformation.browser = ua.browser;
-    }
-
-    get testSessionId() {
-        return this.sessionId.toString();
-    }
-
-    /**
-     * Opens up the session, performing the necessary steps to set things up.
-     */
-    open() {
-        console.log("Opening session", this.sessionId);
-        /**
-         * Time in (ms) that the session was started.
-         */
-        this.startDate = Date.now();
-    }
-
-    /**
-     * Closes and cleans up a test session.
-     */
-    close() {
-        console.log("Closing session", this.sessionId);
-        /**
-         * Time in (ms) that the session was started.
-         */
-        this.endDate = Date.now();
-    }
-
-    print() {
-        console.debug(JSON.stringify(this));
-    }
-
-}
-
-/**
- * Defaults of the User's information that will be filled in by the user and system.
- */
-let USER_INFO_DEFAULTS = {
-    name: null,
-    OS: null,
-    browser: null
-}
-
 let DEFAULT_LABEL = {
     category: "",
     order: 0 // Opitonal property that specifies the ordering this test will take place.
