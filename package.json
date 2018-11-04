@@ -9,7 +9,7 @@
     "test": "grunt test",
     "start": "grunt serve",
     "build": "grunt",
-    "start:server": "node server.js"
+    "start:server": "node ./src/server.js"
   },
   "author": {
     "name": "Hakim El Hattab",
