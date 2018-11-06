@@ -9,7 +9,7 @@
     "test": "grunt test",
     "start": "grunt serve",
     "build": "grunt",
-    "test:classes": "node js/slides/slidesModel.js",
+    "test:classes": "node ./src/app/js/slides/slidesModel.js",
     "start:server": "node ./src/server.js"
   },
   "author": {

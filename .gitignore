@@ -13,4 +13,5 @@ package-lock.json
 css/reveal.min.css
 js/reveal.min.js
 .eslintrc.js
+dist/*
 build.zip
