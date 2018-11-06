@@ -9,11 +9,15 @@ class TestSession {
         let ua = UAParser();
 
         this.sessionId = `${TestSession.constructor.name}-${Math.random().toString().slice(2)}`;
-        this.userInformation = USER_INFO_DEFAULTS;
+        this._userInformation = USER_INFO_DEFAULTS;
         this.test_date = Date.now();
-        this.userInformation.OS = ua.os;
-        this.userInformation.browser = ua.browser;
+        this._userInformation.OS = ua.os;
+        this._userInformation.browser = ua.browser;
         this.sessionLog = [];
+    }
+
+    get userInformation(){
+        return this._userInformation;
     }
 
     get testSessionId() {
@@ -21,7 +25,7 @@ class TestSession {
     }
 
     set userName(name){
-        this.userInformation.name = name;
+        this._userInformation.name = name;
     }
 
     /**
