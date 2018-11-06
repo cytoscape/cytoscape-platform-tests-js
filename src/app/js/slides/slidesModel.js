@@ -124,6 +124,28 @@ class TestSlide extends BaseSlide {
     }
 }
 
+class TestSuite {
+    constructor(label = DEFAULT_LABEL){
+        
+        /**
+         *  Optional label for the test suite. This can be used to specify a group of related tests.
+         */
+        this._label = Object.assign({},label);
+
+        /**
+         * A collection of Test Slides in the Test Suite.
+         */
+        this._slides = [];
+    }
+
+    generateBaseSlides(){
+        let starterSlide = new TestSlide();
+        // TODO: Add things to do with the starter slides
+
+        this._slides.push(starterSlide);
+    }
+}
+
 let DEFAULT_LABEL = {
     category: "",
     order: 0 // Opitonal property that specifies the ordering this test will take place.
