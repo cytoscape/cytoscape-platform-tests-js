@@ -177,76 +177,41 @@ function submit_jira(slide){
        }
    }
 };
-// search issue
-// request_data = {"jql":"project = CRT","startAt":0,"maxResults":2, "fields":["id","key"]};
-  
-  report_data= JSON.stringify(request_data)
+
 
   showControls(slide)
   var element = document.createElement('p')
   text = window.DATA.log.join('\n')
   
   element.style = 'font-size: 22px'
-  element.innerHTML = '<button type="submit" onclick="CreateJiraIssue(report_data)">submit Jira Report</button>' + 
+  element.innerHTML = '<button type="submit" id="jiraBtn" onclick="submitReport(request_data)">submit Jira Report</button>' + 
 '<br/>' +
   '<a href="data:text/plain;charset=utf-8,' +
     encodeURIComponent(text1) + '" download="Cytoscape_Testing_results.txt">Download testing results</a>' 
   slide.appendChild(element)
 }
 
-// function CreateJiraIssue(data) {
-//   const Http = new XMLHttpRequest()
-//   Http.open("POST", "https://cytoscape.atlassian.net/rest/api/3/issue")
-//   Http.setRequestHeader("Content-type", "application/json")
-//   Http.setRequestHeader("Accept", "application/json")
-//   Http.setRequestHeader("X-Atlassian-Token", "nocheck")
-//   Http.setRequestHeader("Authorization", "Basic a291aXNzYXJAZ21haWwuY29tOmppcmFzdWNrcw==")
-//   Http.onreadystatechange = function() {
-//     if (this.readyState == 4 && this.status == 200) {
-//       alert(this.responseText);
-//     }
-//   };
-//   Http.send(data)
-//   alert(data);
-//   alert(JSON.stringify(Http.response))
-//   }
   
-  
-  
-  
+ 
+function submitReport(data){
 
-  // send attachment
-function SendJiraAttach(id) {
-const auth = 'Basic ' + new Buffer(props['jiraAppUserName'] + ':' + props['jiraAppPassword']).toString('base64');
-  var options = {
-    url: 'https://cytoscape.atlassian.net/rest/api/3/issue/'+ issueID + '/attachments',
-    headers: {
-      'Authorization': auth,
-      'X-Atlassian-Token': 'nocheck'
-    }
-  };
+const button = document.getElementById('jiraBtn');
+button.addEventListener('click', function(e) {
+  console.log('button was clicked');
 
-  var r = request.post(options, function (err, res, body) {
-      if (err) {
-        console.error(err);
-        resOut.status(500).json({
-          messages: 'outch',
-          obj: {}
-        });
-      } else {
-        console.log('Upload successful!  Server responded with:', body);
-        resOut.status(200).json({
-          messages: 'successfully updated jira ticket',
-          obj: {}
-        });
+  fetch('/api', {method: 'POST'})
+    .then(function(response) {
+      if(response.ok) {
+        console.log('Click was recorded');
+        return;
       }
-    }
-  );
-  var form = r.form();
-  form.append('file', fs.createReadStream('./somefile.png'));
+      throw new Error('Request failed.');
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+});
 }
-
-  
 
   
 /* File drop area */
