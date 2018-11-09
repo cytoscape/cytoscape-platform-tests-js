@@ -51,7 +51,8 @@
   "dependencies": {
     "body-parser": "~1.0.1",
     "express": "~4.0.0",
-    "request-promise": "^4.2.2"
+    "request-promise": "^4.2.2",
+    "ua-parser-js": "^0.7.19"
   },
   "license": "MIT"
   }
