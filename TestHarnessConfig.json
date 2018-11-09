@@ -1,0 +1,13 @@
+{
+    "SoftwareTitle": "Cytoscape Test Harness",
+    "SoftwareVersion": "1.0",
+    "TestHarnessSlideNumber":"10",
+    "SendLogToCytoScape":"true",
+    "LogToFile":"true",
+    "UseInstallationScript":"false",
+    "TesterGroups":[
+        {"Beginner":"true" },
+        {"Intermediate":"false"},
+        {"Advanced":"false"}
+    ]    
+}
