@@ -8,8 +8,10 @@ function toggleLog () {
 }
 
 function init (slide) {
+  console.debug("Main init", slide, session);
+
   addResponse(slide.id, { 'appVersion': window.navigator['appVersion'] })
-  showControls(slide)
+  showControls(slide);
 }
 
 /* SLIDES */
@@ -405,7 +407,10 @@ Reveal.addEventListener('slidechanged', function (event) {
   call(event.currentSlide)
 })
 
+// Creating the test session instance for the user.
+const session = new TestSession();
 const cyCaller = new CyCaller()
-cyCaller.setLogCallBack(log)
+// Setting the logger callback to the session log.
+cyCaller.setLogCallBack(session.log)
 setTimeout(() => { call(Reveal.getSlide(0)) }, 500)
 //log('Started Cytoscape Testing', 'init')

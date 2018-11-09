@@ -1,7 +1,8 @@
 /* global module:false */
 module.exports = function(grunt) {
 	var port = grunt.option('port') || 8000;
-	var root = grunt.option('root') || '.';
+	const srcFolder = "src/app/";
+	var root = grunt.option('root') || `./${srcFolder}`;
 
 	if (!Array.isArray(root)) root = [root];
 
@@ -29,28 +30,28 @@ module.exports = function(grunt) {
 				ie8: true
 			},
 			build: {
-				src: 'js/reveal.js',
-				dest: 'js/reveal.min.js'
+				src: `${srcFolder}js/reveal.js`,
+				dest: `${srcFolder}js/reveal.min.js`
 			}
 		},
 
 		sass: {
 			core: {
-				src: 'css/reveal.scss',
-				dest: 'css/reveal.css'
+				src: `${srcFolder}css/reveal.scss`,
+				dest: `${srcFolder}css/reveal.css`
 			},
 			themes: {
 				expand: true,
-				cwd: 'css/theme/source',
+				cwd: `${srcFolder}css/theme/source`,
 				src: ['*.sass', '*.scss'],
-				dest: 'css/theme',
+				dest: `${srcFolder}css/theme`,
 				ext: '.css'
 			}
 		},
 
 		autoprefixer: {
 			core: {
-				src: 'css/reveal.css'
+				src: `${srcFolder}css/reveal.css`
 			}
 		},
 
@@ -59,8 +60,8 @@ module.exports = function(grunt) {
 				compatibility: 'ie9'
 			},
 			compress: {
-				src: 'css/reveal.css',
-				dest: 'css/reveal.min.css'
+				src: `${srcFolder}css/reveal.css`,
+				dest: `${srcFolder}css/reveal.min.css`
 			}
 		},
 
@@ -88,7 +89,7 @@ module.exports = function(grunt) {
 					exports: false
 				}
 			},
-			files: [ 'Gruntfile.js', 'js/reveal.js' ]
+			files: [ 'Gruntfile.js', `${srcFolder}js/reveal.js` ]
 		},
 
 		connect: {
@@ -106,14 +107,14 @@ module.exports = function(grunt) {
 		zip: {
 			bundle: {
 				src: [
-					'index.html',
-					'css/**',
-					'js/**',
-					'lib/**',
-					'images/**',
-					'plugin/**',
-					'spec/**',
-					'**.md'
+					`${srcFolder}index.html`,
+					`${srcFolder}css/**`,
+					`${srcFolder}js/**`,
+					`${srcFolder}lib/**`,
+					`${srcFolder}images/**`,
+					`${srcFolder}plugin/**`,
+					`${srcFolder}spec/**`,
+					`**.md`
 				],
 				dest: 'build.zip'
 			}
@@ -125,20 +126,20 @@ module.exports = function(grunt) {
 
 		watch: {
 			js: {
-				files: [ 'Gruntfile.js', 'js/reveal.js' ],
+				files: [ 'Gruntfile.js', `${srcFolder}js/reveal.js` ],
 				tasks: 'js'
 			},
 			theme: {
 				files: [
-					'css/theme/source/*.sass',
-					'css/theme/source/*.scss',
-					'css/theme/template/*.sass',
-					'css/theme/template/*.scss'
+					`${srcFolder}css/theme/source/*.sass`,
+					`${srcFolder}css/theme/source/*.scss`,
+					`${srcFolder}css/theme/template/*.sass`,
+					`${srcFolder}css/theme/template/*.scss`
 				],
 				tasks: 'css-themes'
 			},
 			css: {
-				files: [ 'css/reveal.scss' ],
+				files: [ `${srcFolder}css/reveal.scss` ],
 				tasks: 'css-core'
 			},
 			html: {
@@ -153,7 +154,7 @@ module.exports = function(grunt) {
 		},
 
 		retire: {
-			js: [ 'js/reveal.js', 'lib/js/*.js', 'plugin/**/*.js' ],
+			js: [ `${srcFolder}js/reveal.js`, `${srcFolder}lib/js/*.js`, `${srcFolder}plugin/**/*.js` ],
 			node: [ '.' ]
 		}
 
