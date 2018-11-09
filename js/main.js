@@ -161,8 +161,8 @@ function submit_jira(slide){
   var tester = document.getElementById('name').value
   var env = JSON.stringify(window.DATA['responses'].init.user_environment)
   var summary = env + ', Tester: ' + tester 
-  var uf = document.getElementById('feedback').value
-  addResponse('user_feedback', { 'feedback': uf })
+  var userFeedback = document.getElementById('feedback').value
+  addResponse('user_feedback', { 'feedback': userFeedback })
   log(JSON.stringify(window.DATA['responses']))
   text1=JSON.stringify(window.DATA['responses'])
 
