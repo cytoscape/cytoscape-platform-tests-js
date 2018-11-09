@@ -8,10 +8,13 @@ function toggleLog () {
 }
 
 function init (slide) {
+  // define test start time and add to response stack
+  var testDate = new Date()
+  addResponse(slide.id, { 'test_date': testDate })
+  // define user environment information: OS and browser version and add to response
+  addResponse(slide.id, { 'user_environment': window.navigator['appVersion'] })
+  showControls(slide)
   console.debug("Main init", slide, session);
-
-  addResponse(slide.id, { 'appVersion': window.navigator['appVersion'] })
-  showControls(slide);
 }
 
 /* SLIDES */
@@ -125,6 +128,8 @@ function runjasmine (slide) {
 
 function feedback(slide){
   setTimeout(() => { showControls(slide) }, 500 )
+  
+
 }
 
 function close_cytoscape_slide(slide){
@@ -152,6 +157,64 @@ function submit_slide(slide){
   slide.appendChild(element)
 }
 
+function submit_jira(slide){
+  var tester = document.getElementById('name').value
+  var env = JSON.stringify(window.DATA['responses'].init.user_environment)
+  var summary = env + ', Tester: ' + tester 
+  var userFeedback = document.getElementById('feedback').value
+  addResponse('user_feedback', { 'feedback': userFeedback })
+  log(JSON.stringify(window.DATA['responses']))
+  text1=JSON.stringify(window.DATA['responses'])
+
+  request_data =  {
+    "fields": {
+    	"summary": summary,
+    	"project":
+       {
+          "id": "10101"
+       },
+       "issuetype": {
+          "id": "10100"
+       }
+   }
+};
+
+
+  showControls(slide)
+  var element = document.createElement('p')
+  text = window.DATA.log.join('\n')
+  
+  element.style = 'font-size: 22px'
+  element.innerHTML = '<button type="submit" id="jiraBtn" onclick="submitReport(request_data)">submit Jira Report</button>' + 
+'<br/>' +
+  '<a href="data:text/plain;charset=utf-8,' +
+    encodeURIComponent(text1) + '" download="Cytoscape_Testing_results.txt">Download testing results</a>' 
+  slide.appendChild(element)
+}
+
+  
+ 
+function submitReport(data){
+
+const button = document.getElementById('jiraBtn');
+button.addEventListener('click', function(e) {
+  console.log('button was clicked');
+
+  fetch('/api', {method: 'POST'})
+    .then(function(response) {
+      if(response.ok) {
+        console.log('Click was recorded');
+        return;
+      }
+      throw new Error('Request failed.');
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+});
+}
+
+  
 /* File drop area */
 function handleCYS(files) {
   addResponse('session_save', { 'file_size': files[0].size })
@@ -259,7 +322,7 @@ function addResponse (name, data) {
   if (!window.DATA.responses.hasOwnProperty(name)) {
     window.DATA.responses[name] = {}
   }
-  window.res = Object.assign(window.DATA.responses[name], data)
+  window.res = Object.assign(window.DATA.responses[name], data )
 }
 
 function log (message, context = 'info') {
@@ -323,7 +386,8 @@ function call (slide) {
     'runjasmine': runjasmine,
     'user_feedback': feedback,
     'close_cytoscape': close_cytoscape_slide,
-    'submit': submit_slide
+    'submit': submit_slide,
+    'submit_jira': submit_jira
   }
 
   log('Starting slide', slide.id)
@@ -332,7 +396,7 @@ function call (slide) {
     Reveal.configure({ controls: false, slideNumber: 'c/t', progress: true })
     try{
       funcs[slide.id](slide)
-      setTimeout(() => { Reveal.configure({ controls: true }) }, 10000)
+      setTimeout(() => { Reveal.configure({ controls: true }) }, 100)
     } catch(e){
       console.log(e)
     }    
