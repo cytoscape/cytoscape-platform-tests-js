@@ -7,6 +7,7 @@
 var express    = require('express');        // call express
 var app        = express();                 // define our app using express
 var bodyParser = require('body-parser');
+//TODO must update path correctly
 var testHarnessPath = "./docs";
 
 // configure app to use bodyParser()
