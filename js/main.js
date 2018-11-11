@@ -157,6 +157,7 @@ function submit_slide(slide) {
   slide.appendChild(element)
 }
 
+// preparing report submission work
 function submit_jira(slide) {
   var tester = document.getElementById('name').value
   var env = JSON.stringify(window.DATA['responses'].init.user_environment)
@@ -165,20 +166,6 @@ function submit_jira(slide) {
   addResponse('user_feedback', { 'feedback': userFeedback })
   log(JSON.stringify(window.DATA['responses']))
   text1 = JSON.stringify(window.DATA['responses'])
-
-  request_data = {
-    "fields": {
-      "summary": summary,
-      "project":
-      {
-        "id": "10101"
-      },
-      "issuetype": {
-        "id": "10100"
-      }
-    }
-  };
-
 
   showControls(slide)
   var element = document.createElement('p')

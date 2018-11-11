@@ -191,7 +191,25 @@ function submit_jira(slide) {
   slide.appendChild(element)
 }
 
+// call our server rest api 
+function submitReport(data) {
+  const button = document.getElementById('jiraBtn');
+  button.addEventListener('click', function (e) {
+    console.log('button was clicked');
 
+    fetch('/api/SubmitJira', { method: 'POST' })
+      .then(function (response) {
+        if (response.ok) {
+          console.log('Click was recorded');
+          return;
+        }
+        throw new Error('Request failed.');
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  });
+}
 /* File drop area */
 function handleCYS(files) {
   addResponse('session_save', { 'file_size': files[0].size })
