@@ -95,6 +95,7 @@ git checkout $BRANCH
 npm install && \
 npm run build && \
 npm run start
+
 ```
 
 If the previous block was run in a terminal, skip to step 8 and only execute that step.
