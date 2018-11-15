@@ -82,7 +82,22 @@ If you would like to contribute to the Cytoscape platform tests, please read the
 
 ### Full setup
 
-To setup a local server and view the reveal.js testing slides that we have created, do the following:
+To setup a local server and view the reveal.js testing slides that we have created, do the following, below. However, if you want to skip all the steps, here is the TLDR.
+
+```
+DIR=${HOME}/projects
+BRANCH=develop
+
+cd $DIR && \
+git clone https://github.com/Swen670Grp1/cytoscape-platform-tests-js.git && \
+cd cytoscape-platform-tests-js && \
+git checkout $BRANCH
+npm install && \
+npm run build && \
+npm run start
+```
+
+
 
 1. Install [Node.js](http://nodejs.org/) (4.0.0 or later). We use [Grunt](https://github.com/gruntjs/grunt) to simplify the build process
 
@@ -94,6 +109,11 @@ To setup a local server and view the reveal.js testing slides that we have creat
 1. Navigate to the folder
    ```sh
    $ cd cytoscape-platform-tests-js
+   ```
+
+1. Checkout the appropriate branch (develop or master)
+   ```sh
+   $ git checkout develop
    ```
 
 1. Install dependencies
