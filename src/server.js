@@ -10,6 +10,7 @@ var bodyParser = require('body-parser');
 const request = require('request-promise');
 var testHarnessPath = "./src/app";
 var port = process.env.PORT || 8080;        // set our port
+var fs = require('fs');
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -27,10 +28,15 @@ router.get('/', (req, res) => {
 });
 
 // Jira Route to create Jira issue id
-router.post('/SubmitJira', function (req, res) {
+router.get('/SubmitJira', function (req, res) {
+  var env = req.param('env');
+  var tester = req.param('tester');
+  var summary = env + ', Tester: ' + tester
+  fileData = req.param('fileData');
+
   request_data = {
     "fields": {
-      "summary": "Auto generated report for testing. Pls ignore",
+      "summary": summary,
       "project":
       {
         "id": "10101"
@@ -44,7 +50,7 @@ router.post('/SubmitJira', function (req, res) {
   const options = {
     method: 'POST',
     uri: 'https://cytoscape.atlassian.net/rest/api/3/issue',
-    body: request_data, //req.body,
+    body: request_data,
     json: true,
     headers: {
       'Content-Type': 'application/json',
@@ -54,16 +60,24 @@ router.post('/SubmitJira', function (req, res) {
   }
 
   request(options).then(function (response) {
+    let key = response.key;
+    SendJiraAttach(key, reportData);
+    console.log(key)
+    res.send(response)
     res.status(200).json(response);
+
   })
     .catch(function (err) {
       console.log(err);
     })
-
 });
 
+router.get('/addAttach', function (req, res) {
+  var issueID= 'CRT-6'
+var resp = SendJiraAttach(issueID)
+res.send(resp)
+});
 
-// more routes for our API will happen here
 
 // REGISTER OUR ROUTES -------------------------------
 // all of our routes will be prefixed with /api
@@ -71,12 +85,13 @@ app.use('/api', router);
 app.use('/', express.static(testHarnessPath));
 
 // send attachment
-function SendJiraAttach(id) {
-  const auth = 'Basic ' + new Buffer(props['jiraAppUserName'] + ':' + props['jiraAppPassword']).toString('base64');
+function SendJiraAttach(issueID, reportData) {
   var options = {
     url: 'https://cytoscape.atlassian.net/rest/api/3/issue/' + issueID + '/attachments',
     headers: {
-      'Authorization': auth,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Basic a291aXNzYXJAZ21haWwuY29tOmppcmFzdWNrcw==',
       'X-Atlassian-Token': 'nocheck'
     }
   };
@@ -84,21 +99,20 @@ function SendJiraAttach(id) {
   var r = request.post(options, function (err, res, body) {
     if (err) {
       console.error(err);
-      resOut.status(500).json({
+      res.status(500).json({
         messages: 'outch',
         obj: {}
       });
     } else {
       console.log('Upload successful!  Server responded with:', body);
-      resOut.status(200).json({
-        messages: 'successfully updated jira ticket',
-        obj: {}
-      });
+      console.log(JSON.stringify(body))
+      return res
     }
   }
   );
+  
   var form = r.form();
-  form.append('file', fs.createReadStream('./somefile.png'));
+  form.append('file', fs.createReadStream('filetobeuploaded'));
 }
 
 

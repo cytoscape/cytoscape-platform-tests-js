@@ -157,7 +157,7 @@ function submit_slide(slide) {
   slide.appendChild(element)
 }
 
-// preparing report submission work
+// preparing report submission work -- testing only should be removed soon
 function submit_jira(slide) {
   var tester = document.getElementById('name').value
   var env = JSON.stringify(window.DATA['responses'].init.user_environment)
@@ -172,7 +172,7 @@ function submit_jira(slide) {
   text = window.DATA.log.join('\n')
 
   element.style = 'font-size: 22px'
-  element.innerHTML = '<button type="submit" id="jiraBtn" onclick="submitReport(request_data)">submit Jira Report</button>' +
+  element.innerHTML = '<button type="submit" id="jiraBtn" onclick="submitReport()">submit Jira Report</button>' +
     '<br/>' +
     '<a href="data:text/plain;charset=utf-8,' +
     encodeURIComponent(text1) + '" download="Cytoscape_Testing_results.txt">Download testing results</a>'
@@ -181,15 +181,20 @@ function submit_jira(slide) {
 
 
 // call our server rest api 
-function submitReport(data) {
+function submitReport() {
   const button = document.getElementById('jiraBtn');
   button.addEventListener('click', function (e) {
-    console.log('button was clicked');
+  //for testing only
+  var tester = document.getElementById('name').value
+  var env = JSON.stringify(window.DATA['responses'].init.user_environment)
+  // var env = 'MacChrome38'
+  // var tester = 'TestingGuru'
+  var req_url = '/api/SubmitJira?env=' + env + '&tester=' + tester
 
-    fetch('/api', { method: 'POST' })
+    fetch(req_url, { method: 'GET' })
       .then(function (response) {
         if (response.ok) {
-          console.log('Click was recorded');
+          log('Jira submit request sent to server');
           return;
         }
         throw new Error('Request failed.');

@@ -139,76 +139,99 @@ function close_cytoscape_slide(slide) {
   initDropArea(slide, "logDrop", text, '.log', handleLog)
 }
 
+// this is where we allow user to download a copy of the report and submit the final report to Jira
 function submit_slide(slide) {
   showControls(slide)
   var element = document.createElement('p')
+  //TODO update to obtain data from new log object
   text = window.DATA.log.join('\n')
-
   element.style = 'font-size: 22px'
   element.innerHTML = '<a href="data:text/plain;charset=utf-8,' +
     encodeURIComponent(text) + '" download="Cytoscape_Testing_results.txt">Download testing results</a>' +
     '<br/> and <br/>' +
-    '<a href="https://docs.google.com/forms/d/e/1FAIpQLSd6mqK5yYd7ziRNqL37B5rxf-gI2z2_9oahjvcf-OXBUqOPGQ/viewform">submit them here</a>' +
-    ' or ' +
-    '<a target="_blank" href="mailto:bsettle@ucsd.edu">email them to bsettle@ucsd.edu</a></p>'
+    '<button type="submit" id="jiraBtn" onclick="submitReport()">Submit Jira Report</button>'
 
   slide.appendChild(element)
 }
 
-// code to handle creation of an issue and submission of final report to Jira
-function submit_jira(slide) {
-  var tester = document.getElementById('name').value
-  var env = JSON.stringify(window.DATA['responses'].init.user_environment)
-  var summary = env + ', Tester: ' + tester
-  var userFeedback = document.getElementById('feedback').value
-  addResponse('user_feedback', { 'feedback': userFeedback })
-  log(JSON.stringify(window.DATA['responses']))
-  text1 = JSON.stringify(window.DATA['responses'])
-
-  request_data = {
-    "fields": {
-      "summary": summary,
-      "project":
-      {
-        "id": "10101"
-      },
-      "issuetype": {
-        "id": "10100"
-      }
-    }
-  };
-
-
-  showControls(slide)
-  var element = document.createElement('p')
-  text = window.DATA.log.join('\n')
-
-  element.style = 'font-size: 22px'
-  element.innerHTML = '<button type="submit" id="jiraBtn" onclick="submitReport(request_data)">submit Jira Report</button>' +
-    '<br/>' +
-    '<a href="data:text/plain;charset=utf-8,' +
-    encodeURIComponent(text1) + '" download="Cytoscape_Testing_results.txt">Download testing results</a>'
-  slide.appendChild(element)
-}
 
 // call our server rest api 
-function submitReport(data) {
-  const button = document.getElementById('jiraBtn');
-  button.addEventListener('click', function (e) {
-    console.log('button was clicked');
+function submitReport() {
+  text = window.DATA.log.join('\n')
+  var strconfirm = confirm("Are you sure you want to submit the report?");
+  if (strconfirm == true) {
+    var userFeedback = document.getElementById('feedback').value
+    addResponse('user_feedback', { 'feedback': userFeedback })
+    var tester = document.getElementById('name').value
+    session.userName = tester
+    var env = JSON.stringify(window.DATA['responses'].init.user_environment)
+    var req_url = '/api/SubmitJira?env=' + env + '&tester=' + tester + '&fileData=' + text
 
-    fetch('/api/SubmitJira', { method: 'POST' })
+    fetch(req_url, { method: 'GET' })
+    .then((resp) => resp.json())
+    .then(function(data) {
+      log('Jira report submission request sent to api server');
+      let id = data.key;
+      log('Jira issue id is: ' + id)
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+  }
+}
+// call our server rest api 
+// function submitReport() {
+//   var strconfirm = confirm("Are you sure you want to submit the report?");
+//   if (strconfirm == true) {
+//     var userFeedback = document.getElementById('feedback').value
+//     addResponse('user_feedback', { 'feedback': userFeedback })
+//     var tester = document.getElementById('name').value
+//     session.userName = tester
+//     var env = JSON.stringify(window.DATA['responses'].init.user_environment)
+//     var req_url = '/api/SubmitJira?env=' + env + '&tester=' + tester
+
+//     fetch(req_url, { method: 'GET' })
+//       .then(function (response) {
+//         if (response.ok) {
+//           log('Jira report submission request sent to api server');
+//           log(response)
+//           log(JSON.stringify(response).id)
+//           log(JSON.stringify(response.body))
+//           log(JSON.stringify(response.text))
+//           return;
+//         }
+//         throw new Error('Ouch! Request failed.');
+//       })
+//       .catch(function (error) {
+//         log(error);
+//       });
+//   }
+// }
+
+// test
+function attach() {
+
+  var strconfirm = confirm("Are you sure you want to attach the report?");
+  if (strconfirm == true) {
+    // var userFeedback = document.getElementById('feedback').value
+    // addResponse('user_feedback', { 'feedback': userFeedback })
+    // var tester = document.getElementById('name').value
+    // session.userName = tester
+    // var env = JSON.stringify(window.DATA['responses'].init.user_environment)
+   // var req_url = '/api/SubmitJira?env=' + env + '&tester=' + tester
+
+    fetch('api/addAttach', { method: 'GET' })
       .then(function (response) {
         if (response.ok) {
-          console.log('Click was recorded');
+          log('Jira report submission request sent to api server');
           return;
         }
-        throw new Error('Request failed.');
+        throw new Error('Ouch! Request failed.');
       })
       .catch(function (error) {
-        console.log(error);
+        log(error);
       });
-  });
+  }
 }
 /* File drop area */
 function handleCYS(files) {
