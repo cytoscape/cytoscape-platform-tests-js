@@ -82,7 +82,24 @@ If you would like to contribute to the Cytoscape platform tests, please read the
 
 ### Full setup
 
-To setup a local server and view the reveal.js testing slides that we have created, do the following:
+To setup a local server and view the reveal.js testing slides that we have created, do the following, below. However, if you want to skip all the steps, here is the TLDR.
+Paste and execute this block to clone the Test harness repository and check out the desired branch:
+```
+DIR=${HOME}/projects
+BRANCH=develop
+
+cd $DIR && \
+git clone https://github.com/Swen670Grp1/cytoscape-platform-tests-js.git && \
+cd cytoscape-platform-tests-js && \
+git checkout $BRANCH
+npm install && \
+npm run build && \
+npm run start
+
+```
+
+If the previous block was run in a terminal, skip to step 8 and only execute that step.
+
 
 1. Install [Node.js](http://nodejs.org/) (4.0.0 or later). We use [Grunt](https://github.com/gruntjs/grunt) to simplify the build process
 
@@ -96,9 +113,19 @@ To setup a local server and view the reveal.js testing slides that we have creat
    $ cd cytoscape-platform-tests-js
    ```
 
+1. Checkout the appropriate branch (develop or master)
+   ```sh
+   $ git checkout develop
+   ```
+
 1. Install dependencies
    ```sh
    $ npm install
+   ```
+
+1. Build the webapp
+   ```sh
+   $ npm run build
    ```
 
 1. Serve the presentation and monitor source files for changes
@@ -117,7 +144,7 @@ To setup a local server and view the reveal.js testing slides that we have creat
    
 1. To build the standalone webapp, run the build command via grunt
    ```sh
-   $ grunt build
+   $ npm run build
    ```
 ### Test Deck Report Log Structure
 TBD
