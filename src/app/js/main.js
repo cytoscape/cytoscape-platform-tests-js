@@ -2,26 +2,29 @@ window.DATA = { 'log': [], 'responses': {} }
 
 const GALFILTERED = 'https://raw.githubusercontent.com/cytoscape/cytoscape-platform-tests-js/master/networks/galFiltered.cx'
 
-function toggleLog () {
+function toggleLog() {
   const log = document.getElementById('log-container')
   log.style.display = log.style.display === 'none' ? 'block' : 'none'
 }
 
-function init (slide) {
+function init(slide) {
   console.debug("Main init", slide, session);
-
-  addResponse(slide.id, { 'appVersion': window.navigator['appVersion'] })
+  // define test start time and add to response stack
+  var testDate = new Date()
+  addResponse(slide.id, { 'test_date': testDate })
+  // define user environment information: OS and browser version and add to response
+  addResponse(slide.id, { 'user_environment': window.navigator['appVersion'] })
   showControls(slide);
 }
 
 /* SLIDES */
-function close_session (slide) {
+function close_session(slide) {
   cyCaller.delete('/v1/session', {}, function (r) {
     showControls(slide)
   })
 }
 
-function galfiltered (slide) {
+function galfiltered(slide) {
   const url = GALFILTERED
   cyCaller.load_file_from_url(url, function (suid) {
     log('Loaded galfiltered with SUID ' + suid, slide.id)
@@ -48,7 +51,7 @@ function galfiltered (slide) {
   })
 }
 
-function diffusion (slide) {
+function diffusion(slide) {
   const select_nodes = (suid, node_suids) => {
     cyCaller.put('/v1/networks/' + suid + '/nodes/selected', node_suids, function () {
       cyCaller.post('/diffusion/v1/currentView/diffuse', {}, () => {
@@ -70,7 +73,7 @@ function diffusion (slide) {
   })
 }
 
-function layout (slide) {
+function layout(slide) {
   const url = GALFILTERED
   cyCaller.load_file_from_url(url, function (suid) {
     cyCaller.get('/v1/apply/layouts/circular/' + suid,
@@ -80,78 +83,156 @@ function layout (slide) {
   })
 }
 
-function session_save (slide) {
+function session_save(slide) {
   const post_save = (loc) => {
     initDropArea(slide, "cysDrop", 'Saved session file to ' + loc + '.cys', '.cys', handleCYS)
-		showControls(slide)
-	}
-	const url = GALFILTERED
+    showControls(slide)
+  }
+  const url = GALFILTERED
   cyCaller.load_file_from_url(url, function (suid) {
     cyCaller.get('/v1/session?file=//', (loc) => {
       loc = JSON.parse(loc)
-			if (loc.hasOwnProperty('errors')){
+      if (loc.hasOwnProperty('errors')) {
         path = loc['errors'][0]['link']
         window.logFilePath = path
-				loc = path.substr(5, path.lastIndexOf('.')-5)
-    		cyCaller.post('/v1/session?file=' + loc, {}, (loc2) => {
-					loc2 = JSON.parse(loc2)['file']
-					post_save(loc2)
-				})
-			}
-		})
+        loc = path.substr(5, path.lastIndexOf('.') - 5)
+        cyCaller.post('/v1/session?file=' + loc, {}, (loc2) => {
+          loc2 = JSON.parse(loc2)['file']
+          post_save(loc2)
+        })
+      }
+    })
   })
 }
 
-function toggle_tests(vis){
+function toggle_tests(vis) {
   const testDiv = document.getElementById('tests')
   const revealContainer = document.getElementById('reveal-container')
 
-  if (vis){
+  if (vis) {
     testDiv.style.position = 'absolute'
     testDiv.style.zIndex = 200
     testDiv.style.bottom = 0
     testDiv.style.height = '50%'
     revealContainer.style.height = '50%'
-  }else{
+  } else {
     revealContainer.style.height = '100%'
     testDiv.style.height = '0%'
   }
 }
 
-function runjasmine (slide) {
+function runjasmine(slide) {
   log(JSON.stringify(window.DATA['responses']), slide.id)
   window.runtests()
 }
 
-function feedback(slide){
-  setTimeout(() => { showControls(slide) }, 500 )
+function feedback(slide) {
+  setTimeout(() => { showControls(slide) }, 500)
 }
 
-function close_cytoscape_slide(slide){
+function close_cytoscape_slide(slide) {
   setTimeout(() => { showControls(slide) }, 500)
   let text = "Default location is in your Home Directory, at <br/>~/CytoscapeConfiguration/3/framework.log"
-  if (window.logFilePath){
+  if (window.logFilePath) {
     text = "Load log file from " + window.logFilePath
   }
   initDropArea(slide, "logDrop", text, '.log', handleLog)
 }
 
-function submit_slide(slide){
+// this is where we allow user to download a copy of the report and submit the final report to Jira
+function submit_slide(slide) {
   showControls(slide)
   var element = document.createElement('p')
+  //TODO update to obtain data from new log object
   text = window.DATA.log.join('\n')
-  
   element.style = 'font-size: 22px'
   element.innerHTML = '<a href="data:text/plain;charset=utf-8,' +
     encodeURIComponent(text) + '" download="Cytoscape_Testing_results.txt">Download testing results</a>' +
     '<br/> and <br/>' +
-    '<a href="https://docs.google.com/forms/d/e/1FAIpQLSd6mqK5yYd7ziRNqL37B5rxf-gI2z2_9oahjvcf-OXBUqOPGQ/viewform">submit them here</a>' +
-    ' or ' +
-    '<a target="_blank" href="mailto:bsettle@ucsd.edu">email them to bsettle@ucsd.edu</a></p>'
+    '<button type="submit" id="jiraBtn" onclick="submitReport()">Submit Jira Report</button>'
 
   slide.appendChild(element)
 }
 
+
+// call our server rest api 
+function submitReport() {
+  text = window.DATA.log.join('\n')
+  var strconfirm = confirm("Are you sure you want to submit the report?");
+  if (strconfirm == true) {
+    var userFeedback = document.getElementById('feedback').value
+    addResponse('user_feedback', { 'feedback': userFeedback })
+    var tester = document.getElementById('name').value
+    session.userName = tester
+    var env = JSON.stringify(window.DATA['responses'].init.user_environment)
+    var req_url = '/api/SubmitJira?env=' + env + '&tester=' + tester + '&fileData=' + text
+
+    fetch(req_url, { method: 'GET' })
+    .then((resp) => resp.json())
+    .then(function(data) {
+      log('Jira report submission request sent to api server');
+      let id = data.key;
+      log('Jira issue id is: ' + id)
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+  }
+}
+// call our server rest api 
+// function submitReport() {
+//   var strconfirm = confirm("Are you sure you want to submit the report?");
+//   if (strconfirm == true) {
+//     var userFeedback = document.getElementById('feedback').value
+//     addResponse('user_feedback', { 'feedback': userFeedback })
+//     var tester = document.getElementById('name').value
+//     session.userName = tester
+//     var env = JSON.stringify(window.DATA['responses'].init.user_environment)
+//     var req_url = '/api/SubmitJira?env=' + env + '&tester=' + tester
+
+//     fetch(req_url, { method: 'GET' })
+//       .then(function (response) {
+//         if (response.ok) {
+//           log('Jira report submission request sent to api server');
+//           log(response)
+//           log(JSON.stringify(response).id)
+//           log(JSON.stringify(response.body))
+//           log(JSON.stringify(response.text))
+//           return;
+//         }
+//         throw new Error('Ouch! Request failed.');
+//       })
+//       .catch(function (error) {
+//         log(error);
+//       });
+//   }
+// }
+
+// test
+function attach() {
+
+  var strconfirm = confirm("Are you sure you want to attach the report?");
+  if (strconfirm == true) {
+    // var userFeedback = document.getElementById('feedback').value
+    // addResponse('user_feedback', { 'feedback': userFeedback })
+    // var tester = document.getElementById('name').value
+    // session.userName = tester
+    // var env = JSON.stringify(window.DATA['responses'].init.user_environment)
+   // var req_url = '/api/SubmitJira?env=' + env + '&tester=' + tester
+
+    fetch('api/addAttach', { method: 'GET' })
+      .then(function (response) {
+        if (response.ok) {
+          log('Jira report submission request sent to api server');
+          return;
+        }
+        throw new Error('Ouch! Request failed.');
+      })
+      .catch(function (error) {
+        log(error);
+      });
+  }
+}
 /* File drop area */
 function handleCYS(files) {
   addResponse('session_save', { 'file_size': files[0].size })
@@ -189,16 +270,16 @@ function initDropArea(slide, id, text, ext, callback) {
   label.className = 'button'
   label.htmlFor = id
   label.innerText = "Select " + ext + " file"
-  
+
   dropForm.appendChild(note)
   dropForm.appendChild(fileBtn)
   dropForm.appendChild(label)
   dropArea.appendChild(dropForm)
   slide.appendChild(dropArea)
-  
-  ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    dropArea.addEventListener(eventName, preventDefaults, false)
-  })
+
+    ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, preventDefaults, false)
+    })
 
   function preventDefaults(e) {
     e.preventDefault()
@@ -208,9 +289,9 @@ function initDropArea(slide, id, text, ext, callback) {
     dropArea.addEventListener(eventName, highlight, false)
   })
 
-  ;['dragleave', 'drop'].forEach(eventName => {
-    dropArea.addEventListener(eventName, unhighlight, false)
-  })
+    ;['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, unhighlight, false)
+    })
 
   function highlight(e) {
     dropArea.classList.add('highlight')
@@ -225,7 +306,7 @@ function initDropArea(slide, id, text, ext, callback) {
   function handleDrop(e) {
     let dt = e.dataTransfer
     let files = dt.files
-    if (files.length < 1 || !files[0].name.endsWith(ext)){
+    if (files.length < 1 || !files[0].name.endsWith(ext)) {
       alert("Only " + ext + " files are supported")
       return
     }
@@ -237,10 +318,10 @@ function initDropArea(slide, id, text, ext, callback) {
 }
 
 /* HELPERS */
-function showResultSubmit(text){
+function showResultSubmit(text) {
   const form = Reveal.getCurrentSlide().getElementsByTagName('form')[0]
   var element = document.createElement('p')
-  if (text === null){
+  if (text === null) {
     text = '--- REVEAL.JS ---\n' + window.DATA.log.join('\n')
   }
   element.style = 'font-size: 22px'
@@ -255,14 +336,14 @@ function showResultSubmit(text){
   window.close_cytoscape.appendChild(element)
 }
 
-function addResponse (name, data) {
+function addResponse(name, data) {
   if (!window.DATA.responses.hasOwnProperty(name)) {
     window.DATA.responses[name] = {}
   }
   window.res = Object.assign(window.DATA.responses[name], data)
 }
 
-function log (message, context = 'info') {
+function log(message, context = 'info') {
   const line = context + ' :: ' + message
   window.DATA['log'].push(line)
   const log = document.getElementById('log')
@@ -270,7 +351,7 @@ function log (message, context = 'info') {
   log.scrollTop = log.scrollHeight
 }
 
-function buildInput (n) {
+function buildInput(n) {
   let entry = ''
   if (n['type'] === 'checkbox') {
     entry = "<input type='checkbox' id='" + n['id'] + "' class='" + n['id'] + "'/>" +
@@ -287,14 +368,14 @@ function buildInput (n) {
   return "<div class='entry'>" + entry + '</div>'
 }
 
-function buildSlide (options, container) {
+function buildSlide(options, container) {
   var slide = '<h3>' + options.title + '</h3>'
   if (options.text) {
     slide += "<p class='text'>" + options.text + '</p>'
   }
-  slide += '<div class="preload" id="preload" style="display: block;">Preparing test<br>' + 
-  '<img src="images/preload.svg" style="border-width:0px;  background: none;"></img>' +
-  '<p style="font-size: 12px">If it takes too long, hit continue</p></div>'
+  slide += '<div class="preload" id="preload" style="display: block;">Preparing test<br>' +
+    '<img src="images/preload.svg" style="border-width:0px;  background: none;"></img>' +
+    '<p style="font-size: 12px">If it takes too long, hit continue</p></div>'
   slide += '<div class="entries" id="entries" style="display: none;">'
   if (options.inputs) {
     for (var n in options.inputs) {
@@ -305,13 +386,13 @@ function buildSlide (options, container) {
   container.innerHTML = slide
 }
 
-function clearSession (slide, callback) {
+function clearSession(slide, callback) {
   cyCaller.delete('/v1/session', {}, function (r) {
     callback(slide)
   })
 }
 
-function call (slide) {
+function call(slide) {
   toggle_tests(slide.id === 'runjasmine')
   const funcs = {
     'init': init,
@@ -330,18 +411,19 @@ function call (slide) {
   if (funcs.hasOwnProperty(slide.id)) {
     // initialize slide settings for navigation control, current page vs total page, and progress bar
     Reveal.configure({ controls: false, slideNumber: 'c/t', progress: true })
-    try{
+    try {
       funcs[slide.id](slide)
-      setTimeout(() => { Reveal.configure({ controls: true }) }, 10000)
-    } catch(e){
+      //TODO: changed timeout setting for testing purpose, change setting back to 10000ms when ready to deploy
+      setTimeout(() => { Reveal.configure({ controls: true }) }, 100)
+    } catch (e) {
       console.log(e)
-    }    
+    }
   } else {
     showControls(slide)
   }
 }
 
-function save_answers (slide) {
+function save_answers(slide) {
   if (!slide) {
     return
   }
@@ -361,19 +443,19 @@ function save_answers (slide) {
   }
 }
 
-function showControls (slide, vis = true) {
-	var preloaddisplay = vis ? "none" : "block";
+function showControls(slide, vis = true) {
+  var preloaddisplay = vis ? "none" : "block";
   var entriesdisplay = vis ? "block" : "none";
-	if (slide.getElementsByClassName("preload").length > 0) {
-		slide.getElementsByClassName("preload")[0].style.display = preloaddisplay;
-	}
-	if (slide.getElementsByClassName("entries").length > 0) {
-		slide.getElementsByClassName("entries")[0].style.display = entriesdisplay;
-	}
-	if (slide.id === 'runjasmine'){
-		addResponse(slide.id, {'results': window.tests.innerText})
-	}
-	Reveal.configure({ controls: vis })
+  if (slide.getElementsByClassName("preload").length > 0) {
+    slide.getElementsByClassName("preload")[0].style.display = preloaddisplay;
+  }
+  if (slide.getElementsByClassName("entries").length > 0) {
+    slide.getElementsByClassName("entries")[0].style.display = entriesdisplay;
+  }
+  if (slide.id === 'runjasmine') {
+    addResponse(slide.id, { 'results': window.tests.innerText })
+  }
+  Reveal.configure({ controls: vis })
 }
 
 Reveal.initialize({
