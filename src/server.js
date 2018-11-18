@@ -61,7 +61,8 @@ router.get('/SubmitJira', function (req, res) {
 
   request(options).then(function (response) {
     let key = response.key;
-    SendJiraAttach(key, reportData);
+    //TODO turned off for now until we have our report ready
+    //SendJiraAttach(key, reportData);
     console.log(key)
     res.send(response)
     res.status(200).json(response);
@@ -70,12 +71,6 @@ router.get('/SubmitJira', function (req, res) {
     .catch(function (err) {
       console.log(err);
     })
-});
-
-router.get('/addAttach', function (req, res) {
-  var issueID= 'CRT-6'
-var resp = SendJiraAttach(issueID)
-res.send(resp)
 });
 
 

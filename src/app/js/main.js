@@ -154,7 +154,6 @@ function submit_slide(slide) {
   slide.appendChild(element)
 }
 
-
 // call our server rest api 
 function submitReport() {
   text = window.DATA.log.join('\n')
@@ -179,60 +178,7 @@ function submitReport() {
     });
   }
 }
-// call our server rest api 
-// function submitReport() {
-//   var strconfirm = confirm("Are you sure you want to submit the report?");
-//   if (strconfirm == true) {
-//     var userFeedback = document.getElementById('feedback').value
-//     addResponse('user_feedback', { 'feedback': userFeedback })
-//     var tester = document.getElementById('name').value
-//     session.userName = tester
-//     var env = JSON.stringify(window.DATA['responses'].init.user_environment)
-//     var req_url = '/api/SubmitJira?env=' + env + '&tester=' + tester
 
-//     fetch(req_url, { method: 'GET' })
-//       .then(function (response) {
-//         if (response.ok) {
-//           log('Jira report submission request sent to api server');
-//           log(response)
-//           log(JSON.stringify(response).id)
-//           log(JSON.stringify(response.body))
-//           log(JSON.stringify(response.text))
-//           return;
-//         }
-//         throw new Error('Ouch! Request failed.');
-//       })
-//       .catch(function (error) {
-//         log(error);
-//       });
-//   }
-// }
-
-// test
-function attach() {
-
-  var strconfirm = confirm("Are you sure you want to attach the report?");
-  if (strconfirm == true) {
-    // var userFeedback = document.getElementById('feedback').value
-    // addResponse('user_feedback', { 'feedback': userFeedback })
-    // var tester = document.getElementById('name').value
-    // session.userName = tester
-    // var env = JSON.stringify(window.DATA['responses'].init.user_environment)
-   // var req_url = '/api/SubmitJira?env=' + env + '&tester=' + tester
-
-    fetch('api/addAttach', { method: 'GET' })
-      .then(function (response) {
-        if (response.ok) {
-          log('Jira report submission request sent to api server');
-          return;
-        }
-        throw new Error('Ouch! Request failed.');
-      })
-      .catch(function (error) {
-        log(error);
-      });
-  }
-}
 /* File drop area */
 function handleCYS(files) {
   addResponse('session_save', { 'file_size': files[0].size })
