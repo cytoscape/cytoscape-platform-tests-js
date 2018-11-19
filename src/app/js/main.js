@@ -1,16 +1,26 @@
 window.DATA = { 'log': [], 'responses': {} }
 
 const GALFILTERED = 'https://raw.githubusercontent.com/cytoscape/cytoscape-platform-tests-js/master/networks/galFiltered.cx'
+var configurationData;
 
 function toggleLog() {
-  const log = document.getElementById('log-container')
-  log.style.display = log.style.display === 'none' ? 'block' : 'none'
+  const log = document.getElementById('log-container');
+  log.style.display = log.style.display === 'none' ? 'block' : 'none';
+}
+
+async function loadConfiguration(){
+  const config = await fetch("../TestHarnessConfig.JSON");
+  return await config.json();
 }
 
 function init(slide) {
   console.debug("Main init", slide, session);
   // define test start time and add to response stack
-  var testDate = new Date()
+  var testDate = new Date();
+  loadConfiguration().then(data => {
+    configurationData = data;
+    
+  });
   addResponse(slide.id, { 'test_date': testDate })
   // define user environment information: OS and browser version and add to response
   addResponse(slide.id, { 'user_environment': window.navigator['appVersion'] })
