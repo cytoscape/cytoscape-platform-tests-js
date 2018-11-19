@@ -439,6 +439,6 @@ Reveal.addEventListener('slidechanged', function (event) {
 const session = new TestSession();
 const cyCaller = new CyCaller()
 // Setting the logger callback to the session log.
-cyCaller.setLogCallBack(session.log)
+cyCaller.setLogCallBack((message,context) => session.log(message,context));
 setTimeout(() => { call(Reveal.getSlide(0)) }, 500)
 //log('Started Cytoscape Testing', 'init')
