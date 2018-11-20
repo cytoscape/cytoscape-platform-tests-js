@@ -19,7 +19,6 @@ function init(slide) {
   var testDate = new Date();
   loadConfiguration().then(data => {
     configurationData = data;
-    
   });
   addResponse(slide.id, { 'test_date': testDate })
   // define user environment information: OS and browser version and add to response
