@@ -6,6 +6,12 @@ function toggleLog() {
   const log = document.getElementById('log-container')
   log.style.display = log.style.display === 'none' ? 'block' : 'none'
 }
+// catch all javascript errors and display them on the screen
+window.onerror = function (errorMsg, url, lineNumber) {
+  document.getElementById("error-cont").innerHTML = '&emsp;Oops, something went wrong!' + '<br/>' 
+  + '&emsp;Please ensure Cytoscape application is running and try again. Click Log button for details.'
+  log('Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber);
+}
 
 function init(slide) {
   console.debug("Main init", slide, session);
@@ -139,7 +145,7 @@ function close_cytoscape_slide(slide) {
   initDropArea(slide, "logDrop", text, '.log', handleLog)
 }
 
-// this is where we allow user to download a copy of the report and submit the final report to Jira
+// Allow tester to download a copy of the report and submit the final report to Jira
 function submit_slide(slide) {
   showControls(slide)
   var element = document.createElement('p')
@@ -167,15 +173,15 @@ function submitReport() {
     var req_url = '/api/SubmitJira?env=' + env + '&tester=' + tester + '&fileData=' + text
 
     fetch(req_url, { method: 'GET' })
-    .then((resp) => resp.json())
-    .then(function(data) {
-      log('Jira report submission request sent to api server');
-      let id = data.key;
-      log('Jira issue id is: ' + id)
-    })
-    .catch(function(error) {
-      console.log(error);
-    });
+      .then((resp) => resp.json())
+      .then(function (data) {
+        log('Jira report submission request sent to api server');
+        let id = data.key;
+        log('Jira issue id is: ' + id)
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   }
 }
 
@@ -439,6 +445,6 @@ Reveal.addEventListener('slidechanged', function (event) {
 const session = new TestSession();
 const cyCaller = new CyCaller()
 // Setting the logger callback to the session log.
-cyCaller.setLogCallBack((message,context) => session.log(message,context));
+cyCaller.setLogCallBack((message, context) => session.log(message, context));
 setTimeout(() => { call(Reveal.getSlide(0)) }, 500)
 //log('Started Cytoscape Testing', 'init')

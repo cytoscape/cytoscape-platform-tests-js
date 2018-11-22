@@ -105,7 +105,7 @@ function SendJiraAttach(issueID, reportData) {
     }
   }
   );
-  
+
   var form = r.form();
   form.append('file', fs.createReadStream('filetobeuploaded'));
 }
