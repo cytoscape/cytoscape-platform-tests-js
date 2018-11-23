@@ -38,8 +38,9 @@
       <div id="log-button-container">
         <input type="button" id="log-button" onClick="toggleLog()" value="LOG"/>
       </div>
-      <div>
-        <p id="error-cont" style="color:Tomato;font-family: Arial, Helvetica, sans-serif;font-weight:bold;"></p>
+      <div id="error-container" style="display:none">
+        <p id="error-txt" style="color:Tomato;font-family: Arial, Helvetica, sans-serif;font-weight:bold;"></p>
+        <input type="button" style="float:left" id="error-button" onClick="toggleError()" value="OK"/>
       </div>
       <div id="log-container" style="display:none">
         <textarea id="log"></textarea>
