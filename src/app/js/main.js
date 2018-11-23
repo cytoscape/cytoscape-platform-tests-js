@@ -406,7 +406,7 @@ function call(slide) {
     'close_cytoscape': close_cytoscape_slide,
     'submit': submit_slide
   }
-
+  
   log('Starting slide', slide.id)
   if (funcs.hasOwnProperty(slide.id)) {
     // initialize slide settings for navigation control, current page vs total page, and progress bar

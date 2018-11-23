@@ -19,6 +19,7 @@ function init(slide) {
 
 /* SLIDES */
 function close_session(slide) {
+  session.info("This is an info log being tested!!!!!!!!!!!!")
   cyCaller.delete('/v1/session', {}, function (r) {
     showControls(slide)
   })
@@ -27,17 +28,17 @@ function close_session(slide) {
 function galfiltered(slide) {
   const url = GALFILTERED
   cyCaller.load_file_from_url(url, function (suid) {
-    log('Loaded galfiltered with SUID ' + suid, slide.id)
+    session.log('Loaded galfiltered with SUID TTT' + suid, slide.id)
     cyCaller.get('/v1/networks/' + suid + '/edges', function (edges) {
       edges = JSON.parse(edges)
-      log('Edges in galfiltered = ' + edges.length, slide.id)
+      session.log('Edges in galfiltered = ' + edges.length, slide.id)
       addResponse(slide.id)
 
       const check = slide.getElementsByClassName('edgeCountMatches')[0]
       check.labels[0].innerText = 'Edge count is ' + edges.length + '?'
       cyCaller.get('/v1/networks/' + suid + '/nodes', function (nodes) {
         nodes = JSON.parse(nodes)
-        log('Nodes in galfiltered = ' + nodes.length, slide.id)
+        session.log('Nodes in galfiltered = ' + nodes.length, slide.id)
         addResponse(slide.id, {
           'cyrestNodeCount': nodes.length,
           'cyrestEdgeCount': edges.length
@@ -317,7 +318,7 @@ function addResponse(name, data) {
 }
 
 function log(message, context = 'info') {
-  const line = context + ' :: ' + message
+  const line = context + ' ::: ' + message
   window.DATA['log'].push(line)
   const log = document.getElementById('log')
   log.innerHTML = window.DATA['log'].join('\n')
@@ -463,9 +464,10 @@ Reveal.addEventListener('slidechanged', function (event) {
 })
 
 // Creating the test session instance for the user.
-const session = new TestSession();
+//const session = new TestSession();
+const session = new CyLogger();
 const cyCaller = new CyCaller()
 // Setting the logger callback to the session log.
-cyCaller.setLogCallBack(session.log)
+session.setLogCallBack(session.log)
 setTimeout(() => { call(Reveal.getSlide(0)) }, 500)
 //log('Started Cytoscape Testing', 'init')
