@@ -41,9 +41,12 @@ class CyCaller {
         Http.setRequestHeader('Content-type', 'application/json');
         Http.setRequestHeader('Accept', 'application/json');
         Http.onerror = function (err) {
-          const resp = Http.responseText
+          let resp = Http.responseText
+          if(resp == ""){
+            resp = "Unknown Error Occured. Server response not received.";
+          }
           if (_this.log){
-            _this.log("Unknown Error Occured. Server response not received. "+resp.substr(0, 300) + '...', 'response')
+            _this.log(resp.substr(0, 300) + '...', 'response')
           }
           reject(resp);
         };
