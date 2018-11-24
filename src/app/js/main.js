@@ -185,7 +185,7 @@ function submitReport() {
         log('Jira issue id is: ' + id)
       })
       .catch(function (error) {
-        console.log(error);
+        log(error);
       });
   }
 }
@@ -373,7 +373,7 @@ function call(slide) {
       //TODO: changed timeout setting for testing purpose, change setting back to 10000ms when ready to deploy
       setTimeout(() => { Reveal.configure({ controls: true }) }, 100)
     } catch (e) {
-      console.log(e)
+      log(e)
     }
   } else {
     showControls(slide)
