@@ -398,6 +398,8 @@ function buildSlide(options, container) {
 function clearSession(slide, callback) {
   cyCaller.delete('/v1/session', {}, function (r) {
     callback(slide)
+  }).catch(err => {
+    log("Error:"+ err, slide.id);
   })
 }
 
