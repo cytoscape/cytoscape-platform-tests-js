@@ -13,8 +13,8 @@ function toggleError() {
 // catch all javascript errors and display them on the screen
 window.onerror = function (errorMsg, url, lineNumber) {
   toggleError()
-  document.getElementById("error-txt").innerHTML = '&emsp;Oops, something went wrong!' + '<br/>' 
-  + '&emsp;Please ensure Cytoscape application is running and try again. Click Log button for details.'
+  document.getElementById("error-txt").innerHTML = '&emsp;Oops, something went wrong!' + '<br/>'
+    + '&emsp;Please ensure Cytoscape application is running and try again. Click Log button for details.'
   log('Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber);
 }
 
