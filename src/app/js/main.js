@@ -12,6 +12,17 @@ async function loadConfiguration(){
   const config = await fetch("../TestHarnessConfig.JSON");
   return await config.json();
 }
+function toggleError() {
+  const log = document.getElementById('error-container')
+  log.style.display = log.style.display === 'none' ? 'block' : 'none'
+}
+// catch all javascript errors and display them on the screen
+window.onerror = function (errorMsg, url, lineNumber) {
+  toggleError()
+  document.getElementById("error-txt").innerHTML = '&emsp;Oops, something went wrong!' + '<br/>'
+    + '&emsp;Please ensure Cytoscape application is running and try again. Click Log button for details.'
+  log('Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber);
+}
 
 function init(slide) {
   console.debug("Main init", slide, session);
@@ -148,7 +159,7 @@ function close_cytoscape_slide(slide) {
   initDropArea(slide, "logDrop", text, '.log', handleLog)
 }
 
-// this is where we allow user to download a copy of the report and submit the final report to Jira
+// Allow tester to download a copy of the report and submit the final report to Jira
 function submit_slide(slide) {
   showControls(slide)
   var element = document.createElement('p')
@@ -163,7 +174,6 @@ function submit_slide(slide) {
   slide.appendChild(element)
 }
 
-
 // call our server rest api 
 function submitReport() {
   text = window.DATA.log.join('\n')
@@ -177,71 +187,18 @@ function submitReport() {
     var req_url = '/api/SubmitJira?env=' + env + '&tester=' + tester + '&fileData=' + text
 
     fetch(req_url, { method: 'GET' })
-    .then((resp) => resp.json())
-    .then(function(data) {
-      log('Jira report submission request sent to api server');
-      let id = data.key;
-      log('Jira issue id is: ' + id)
-    })
-    .catch(function(error) {
-      console.log(error);
-    });
-  }
-}
-// call our server rest api 
-// function submitReport() {
-//   var strconfirm = confirm("Are you sure you want to submit the report?");
-//   if (strconfirm == true) {
-//     var userFeedback = document.getElementById('feedback').value
-//     addResponse('user_feedback', { 'feedback': userFeedback })
-//     var tester = document.getElementById('name').value
-//     session.userName = tester
-//     var env = JSON.stringify(window.DATA['responses'].init.user_environment)
-//     var req_url = '/api/SubmitJira?env=' + env + '&tester=' + tester
-
-//     fetch(req_url, { method: 'GET' })
-//       .then(function (response) {
-//         if (response.ok) {
-//           log('Jira report submission request sent to api server');
-//           log(response)
-//           log(JSON.stringify(response).id)
-//           log(JSON.stringify(response.body))
-//           log(JSON.stringify(response.text))
-//           return;
-//         }
-//         throw new Error('Ouch! Request failed.');
-//       })
-//       .catch(function (error) {
-//         log(error);
-//       });
-//   }
-// }
-
-// test
-function attach() {
-
-  var strconfirm = confirm("Are you sure you want to attach the report?");
-  if (strconfirm == true) {
-    // var userFeedback = document.getElementById('feedback').value
-    // addResponse('user_feedback', { 'feedback': userFeedback })
-    // var tester = document.getElementById('name').value
-    // session.userName = tester
-    // var env = JSON.stringify(window.DATA['responses'].init.user_environment)
-   // var req_url = '/api/SubmitJira?env=' + env + '&tester=' + tester
-
-    fetch('api/addAttach', { method: 'GET' })
-      .then(function (response) {
-        if (response.ok) {
-          log('Jira report submission request sent to api server');
-          return;
-        }
-        throw new Error('Ouch! Request failed.');
+      .then((resp) => resp.json())
+      .then(function (data) {
+        log('Jira report submission request sent to api server');
+        let id = data.key;
+        log('Jira issue id is: ' + id)
       })
       .catch(function (error) {
         log(error);
       });
   }
 }
+
 /* File drop area */
 function handleCYS(files) {
   addResponse('session_save', { 'file_size': files[0].size })
@@ -425,7 +382,7 @@ function call(slide) {
       //TODO: changed timeout setting for testing purpose, change setting back to 10000ms when ready to deploy
       setTimeout(() => { Reveal.configure({ controls: true }) }, 100)
     } catch (e) {
-      console.log(e)
+      log(e)
     }
   } else {
     showControls(slide)
@@ -502,6 +459,6 @@ Reveal.addEventListener('slidechanged', function (event) {
 const session = new TestSession();
 const cyCaller = new CyCaller()
 // Setting the logger callback to the session log.
-cyCaller.setLogCallBack((message,context) => session.log(message,context));
+cyCaller.setLogCallBack((message, context) => session.log(message, context));
 setTimeout(() => { call(Reveal.getSlide(0)) }, 500)
 //log('Started Cytoscape Testing', 'init')
