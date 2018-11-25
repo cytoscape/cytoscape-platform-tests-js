@@ -8,7 +8,7 @@ function toggleLog() {
   log.style.display = log.style.display === 'none' ? 'block' : 'none';
 }
 
-async function loadConfiguration(){
+async function loadConfiguration() {
   const config = await fetch("../TestHarnessConfig.JSON");
   return await config.json();
 }
@@ -169,39 +169,36 @@ function submit_slide(slide) {
   element.innerHTML = '<a href="data:text/plain;charset=utf-8,' +
     encodeURIComponent(text) + '" download="Cytoscape_Testing_results.txt">Download testing results</a>' +
     '<br/> <br/>' +
-    '<button type="submit" id="jiraBtn" class="btn btn-primary" onclick="submitReport()">Submit Jira Report</button>'
-  //   '<form action="/raw" method="post" encrypt="multipart/form-data>' + 
-  //   '<input type="text" name="username" />' +
-  //   '<input type="file" name="avatar" />' +
-  //   '<button type="submit" />' +
-  // '</form>'
+    '<button type="submit" id="jiraBtn" class="btn btn-primary" onclick="sendData()">Submit Jira Report</button>'
 
   slide.appendChild(element)
 }
 
-// call our server rest api 
-function submitReport() {
+// Process report submission to the server
+function sendData() {
+  //TODO: update with new logger once available
   text = window.DATA.log.join('\n')
   var strconfirm = confirm("Are you sure you want to submit the report?");
   if (strconfirm == true) {
-    var userFeedback = document.getElementById('feedback').value
-    addResponse('user_feedback', { 'feedback': userFeedback })
     var tester = document.getElementById('name').value
     session.userName = tester
-    var env = JSON.stringify(window.DATA['responses'].init.user_environment)
-    var req_url = '/api/SubmitJira?env=' + env + '&tester=' + tester + '&fileData=' + text
+    var testEnv = JSON.stringify(window.DATA['responses'].init.user_environment);
+    var url = '/receiveData';
+    var data = {
+      testerName: tester,
+      testerEnv: testEnv,
+      fileData: text
+    };
 
-    fetch(req_url, { method: 'GET' })
-      .then((resp) => resp.json())
-      .then(function (data) {
-        log('Jira report submission request sent to api server');
-        let id = data.key;
-        alert("Test report submitted successfully! Jira submission ID is: " + id)
-        log('Jira issue id is: ' + id)
-      })
-      .catch(function (error) {
-        log(error);
-      });
+    fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(res => res.json())
+      .then(response => log('Uploaded the test report Successfully to Jira', JSON.stringify(response)))
+      .catch(error => log('Failed to Upload the test report to Jira:', error));
   }
 }
 

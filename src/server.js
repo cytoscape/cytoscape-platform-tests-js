@@ -8,13 +8,20 @@ var express = require('express');        // call express
 var app = express();                 // define our app using express
 var bodyParser = require('body-parser');
 const request = require('request-promise');
+var urlencodedParser = bodyParser.urlencoded({ limit: '50mb', extended: true });
 var testHarnessPath = "./src/app";
 var port = process.env.PORT || 8080;        // set our port
+// define our ticket parameters
+var testerName
+var testerEnv
+var issueKey
+var fileData
+
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }));
 
 // ROUTES FOR OUR API
 // =============================================================================
@@ -25,13 +32,14 @@ router.get('/', (req, res) => {
   res.send('Welcome to Cytoscape Test Harness API')
 });
 
-// Jira Route to create Jira issue id
-router.get('/SubmitJira', function (req, res) {
-  var env = req.param('env');
-  var tester = req.param('tester');
-  var summary = env + ', Tester: ' + tester
-  fileData = req.param('fileData');
+app.post('/receiveData', urlencodedParser, (req, res) => {
 
+  testerName = JSON.stringify(req.body.testerName)
+  testerEnv = JSON.stringify(req.body.testerEnv)
+  fileData = JSON.stringify(req.body.fileData)
+  var summary = testerEnv + ', Tester: ' + testerName;
+
+  // define Jira tickets parameters
   request_data = {
     "fields": {
       "summary": summary,
@@ -58,25 +66,18 @@ router.get('/SubmitJira', function (req, res) {
   }
 
   request(options).then(function (response) {
-    let key = response.key;
-    SendJiraAttach(key, fileData);
+    issueKey = response.key;
+    SendJiraAttach(issueKey, fileData);
     res.send(response)
     res.status(200).json(response);
   })
     .catch(function (err) {
       console.log(err);
     })
-});
-app.post('/raw', (req, res) => {
-
-  // output the headers
-  console.log(req.headers);
-
   // capture the encoded form data
   req.on('data', (data) => {
     console.log(data.toString());
   });
-
   // send a response when finished reading
   // the encoded form data
   req.on('end', () => {
@@ -91,8 +92,48 @@ app.post('/raw', (req, res) => {
 app.use('/api', router);
 app.use('/', express.static(testHarnessPath));
 
-// send attachment
-function SendJiraAttach(key, data){
+// create issue id
+function createJiraIssue() {
+  var summary = testerEnv + ', Tester: ' + testerName;
+
+  // define Jira tickets parameters
+  request_data = {
+    "fields": {
+      "summary": summary,
+      "project":
+      {
+        "id": "10101"
+      },
+      "issuetype": {
+        "id": "10100"
+      }
+    }
+  };
+
+  const options = {
+    method: 'POST',
+    uri: 'https://cytoscape.atlassian.net/rest/api/3/issue',
+    body: request_data,
+    json: true,
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Basic a291aXNzYXJAZ21haWwuY29tOmppcmFzdWNrcw=='
+    }
+  }
+
+  request(options).then(function (response) {
+    issueKey = response.key;
+    SendJiraAttach(issueKey, fileData);
+    res.send(response)
+    res.status(200).json(response);
+  })
+    .catch(function (err) {
+      console.log(err);
+    })
+}
+//send attachment
+function SendJiraAttach(key, data) {
   var options = {
     url: 'https://cytoscape.atlassian.net/rest/api/3/issue/' + key + '/attachments',
     headers: {
@@ -120,8 +161,7 @@ function SendJiraAttach(key, data){
   form.append('file', data, {
     filename: 'test.txt',
     contentType: 'text/plain'
-
-    });
+  });
 }
 
 
