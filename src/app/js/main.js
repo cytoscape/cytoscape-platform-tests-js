@@ -180,7 +180,7 @@ function submit_slide(slide) {
   text = window.DATA.log.join('\n')
   element.style = 'font-size: 22px'
   element.innerHTML = '<a href="data:text/plain;charset=utf-8,' +
-    encodeURIComponent(text) + '" download="Cytoscape_Testing_results.txt">Download testing results</a>' +
+    encodeURIComponent(text) + '" download="Cytoscape_Testing_results.txt">Download Test Results</a>' +
     '<br/> <br/>' +
     '<button type="submit" id="jiraBtn" class="btn btn-primary" onclick="sendData()">Submit Jira Report</button>'
 
