@@ -16,11 +16,24 @@ function toggleError() {
   const log = document.getElementById('error-container')
   log.style.display = log.style.display === 'none' ? 'block' : 'none'
 }
+function updateError(err, level = "Critical!"){
+  const errLog = document.getElementById('error-container')
+  let errMessage = $($.find(".error-message")[0]);
+  let errLevel = val = $($.find(".error-level")[0]);
+  if(err){
+    errMessage.text(err);
+  }else{
+    errMessage.text( '&emsp;Oops, something went wrong!' + '<br/>'
+    + '&emsp;Please ensure Cytoscape application is running and try again. Click Log button for details.')
+  }
+  errLevel.text(level);
+
+  errLog.style.display = 'block';
+}
+
 // catch all javascript errors and display them on the screen
 window.onerror = function (errorMsg, url, lineNumber) {
-  toggleError()
-  document.getElementById("error-txt").innerHTML = '&emsp;Oops, something went wrong!' + '<br/>'
-    + '&emsp;Please ensure Cytoscape application is running and try again. Click Log button for details.'
+  updateError();
   log('Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber);
 }
 
@@ -355,6 +368,11 @@ function buildSlide(options, container) {
 function clearSession(slide, callback) {
   cyCaller.delete('/v1/session', {}, function (r) {
     callback(slide)
+  }).catch(err => {
+    // TODO: The logger should take the responsility of updating the error alerts.
+    log("Error:"+ err, slide.id);
+    let friendlyUserError = `An application error occurred. Please make sure Cytoscape application is running and try again. Click the Log button for more details.`
+    updateError(friendlyUserError, "Error!");
   })
 }
 
