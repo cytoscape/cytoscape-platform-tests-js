@@ -16,7 +16,7 @@ function toggleError() {
   const log = document.getElementById('error-container')
   log.style.display = log.style.display === 'none' ? 'block' : 'none'
 }
-function updateError(err, level = "Danger!"){
+function updateError(err, level = "Critical!"){
   const errLog = document.getElementById('error-container')
   let errMessage = $($.find(".error-message")[0]);
   let errLevel = val = $($.find(".error-level")[0]);
@@ -371,7 +371,8 @@ function clearSession(slide, callback) {
   }).catch(err => {
     // TODO: The logger should take the responsility of updating the error alerts.
     log("Error:"+ err, slide.id);
-    updateError(err);
+    let friendlyUserError = `An application error occurred. Please make sure Cytoscape application is running and try again. Click the Log button for more details.`
+    updateError(friendlyUserError, "Error!");
   })
 }
 
