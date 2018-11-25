@@ -34,7 +34,7 @@ app.post('/receiveData', urlencodedParser, (req, res) => {
   var testerEnv = JSON.stringify(req.body.testerEnv)
   var fileData = JSON.stringify(req.body.fileData)
   var summary = testerEnv + ', Tester: ' + testerName;
-
+  // submit a request to create a jira ticket issue id, we will then call SendJiraAttach to attach the generated report file
   // define Jira tickets parameters
   request_data = {
     "fields": {
@@ -88,46 +88,6 @@ app.post('/receiveData', urlencodedParser, (req, res) => {
 app.use('/api', router);
 app.use('/', express.static(testHarnessPath));
 
-// create issue id
-function createJiraIssue() {
-  var summary = testerEnv + ', Tester: ' + testerName;
-
-  // define Jira tickets parameters
-  request_data = {
-    "fields": {
-      "summary": summary,
-      "project":
-      {
-        "id": "10101"
-      },
-      "issuetype": {
-        "id": "10100"
-      }
-    }
-  };
-
-  const options = {
-    method: 'POST',
-    uri: 'https://cytoscape.atlassian.net/rest/api/3/issue',
-    body: request_data,
-    json: true,
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Basic a291aXNzYXJAZ21haWwuY29tOmppcmFzdWNrcw=='
-    }
-  }
-
-  request(options).then(function (response) {
-    issueKey = response.key;
-    SendJiraAttach(issueKey, fileData);
-    res.send(response)
-    res.status(200).json(response);
-  })
-    .catch(function (err) {
-      console.log(err);
-    })
-}
 //send attachment
 function SendJiraAttach(key, data) {
   var options = {
