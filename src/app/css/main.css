@@ -191,3 +191,13 @@ section#install p{
   position: relative;
   border: 1px solid black;
 }
+
+#error-container {
+  padding-left: 25%;
+  display: block;
+  width: 75%;
+}
+
+#error-text{
+  color:Tomato;font-family: Arial, Helvetica, sans-serif;font-weight:bold;
+}
