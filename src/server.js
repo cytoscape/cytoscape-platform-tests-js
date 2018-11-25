@@ -11,11 +11,7 @@ const request = require('request-promise');
 var urlencodedParser = bodyParser.urlencoded({ limit: '50mb', extended: true });
 var testHarnessPath = "./src/app";
 var port = process.env.PORT || 8080;        // set our port
-// define our ticket parameters
-var testerName
-var testerEnv
-var issueKey
-var fileData
+
 
 
 // configure app to use bodyParser()
@@ -34,9 +30,9 @@ router.get('/', (req, res) => {
 
 app.post('/receiveData', urlencodedParser, (req, res) => {
 
-  testerName = JSON.stringify(req.body.testerName)
-  testerEnv = JSON.stringify(req.body.testerEnv)
-  fileData = JSON.stringify(req.body.fileData)
+  var testerName = JSON.stringify(req.body.testerName)
+  var testerEnv = JSON.stringify(req.body.testerEnv)
+  var fileData = JSON.stringify(req.body.fileData)
   var summary = testerEnv + ', Tester: ' + testerName;
 
   // define Jira tickets parameters
@@ -81,7 +77,7 @@ app.post('/receiveData', urlencodedParser, (req, res) => {
   // send a response when finished reading
   // the encoded form data
   req.on('end', () => {
-    res.send('ok');
+    res.send('OK');
   });
 });
 
