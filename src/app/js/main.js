@@ -337,7 +337,7 @@ function log(message, context = 'info') {
 function buildInput(n) {
   let entry = ''
   if (n['type'] === 'checkbox') {
-    entry = "<input type='checkbox' id='" + n['id'] + "' class='" + n['id'] + "'/>" +
+    entry = "<input type='checkbox' class='custom-control-input' id='" + n['id'] + "' class='" + n['id'] + "'/>" +
       "<label for='" + n['id'] + "'>" + n['text'] + '</label>'
   } else if (n['type'] === 'text') {
     entry = "<label for='" + n['id'] + "'>" + n['text'] + '</label>' +
