@@ -168,8 +168,13 @@ function submit_slide(slide) {
   element.style = 'font-size: 22px'
   element.innerHTML = '<a href="data:text/plain;charset=utf-8,' +
     encodeURIComponent(text) + '" download="Cytoscape_Testing_results.txt">Download testing results</a>' +
-    '<br/> and <br/>' +
-    '<button type="submit" id="jiraBtn" onclick="submitReport()">Submit Jira Report</button>'
+    '<br/> <br/>' +
+    '<button type="submit" id="jiraBtn" class="btn btn-primary" onclick="submitReport()">Submit Jira Report</button>'
+  //   '<form action="/raw" method="post" encrypt="multipart/form-data>' + 
+  //   '<input type="text" name="username" />' +
+  //   '<input type="file" name="avatar" />' +
+  //   '<button type="submit" />' +
+  // '</form>'
 
   slide.appendChild(element)
 }
@@ -191,6 +196,7 @@ function submitReport() {
       .then(function (data) {
         log('Jira report submission request sent to api server');
         let id = data.key;
+        alert("Test report submitted successfully! Jira submission ID is: " + id)
         log('Jira issue id is: ' + id)
       })
       .catch(function (error) {
@@ -198,6 +204,7 @@ function submitReport() {
       });
   }
 }
+
 
 /* File drop area */
 function handleCYS(files) {
