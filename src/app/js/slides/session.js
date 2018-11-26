@@ -14,6 +14,8 @@ class TestSession {
         this._userInformation.OS = ua.os;
         this._userInformation.browser = ua.browser;
         this.sessionLog = [];
+        this.cylog = new CyLogger();
+
     }
 
     get userInformation(){
@@ -27,23 +29,23 @@ class TestSession {
     set userName(name){
         this._userInformation.name = name;
     }
-
+    
     /**
      * Opens up the session, performing the necessary steps to set things up.
      */
     open() {
-        console.log("Opening session", this.sessionId);
+        this.cylog.log("Opening session", this.sessionId);
         /**
          * Time in (ms) that the session was started.
          */
-        this.startDate = Date.now();
+        startDate = Date.now();
     }
 
     /**
      * Closes and cleans up a test session.
      */
     close() {
-        console.log("Closing session", this.sessionId);
+        this.cylog.log("Closing session", this.sessionId);
         /**
          * Time in (ms) that the session was started.
          */
@@ -51,7 +53,7 @@ class TestSession {
     }
 
     print() {
-        console.debug(JSON.stringify(this));
+        cthis.cylog.debug(JSON.stringify(this));
     }
 
     /**
