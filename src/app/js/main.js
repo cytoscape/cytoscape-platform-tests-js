@@ -16,15 +16,15 @@ function toggleError() {
   const log = document.getElementById('error-container')
   log.style.display = log.style.display === 'none' ? 'block' : 'none'
 }
-function updateError(err, level = "Critical!"){
+function updateError(err, level = "Critical!") {
   const errLog = document.getElementById('error-container')
   let errMessage = $($.find(".error-message")[0]);
   let errLevel = val = $($.find(".error-level")[0]);
-  if(err){
+  if (err) {
     errMessage.text(err);
-  }else{
-    errMessage.text( '&emsp;Oops, something went wrong!' + '<br/>'
-    + '&emsp;Please ensure Cytoscape application is running and try again. Click Log button for details.')
+  } else {
+    errMessage.text('Oops, something went wrong!' + '<br/>'
+      + 'Please ensure Cytoscape application is running and try again. Click Log button for details.')
   }
   errLevel.text(level);
 
@@ -190,16 +190,20 @@ function submit_slide(slide) {
 // Process report submission to the server
 function sendData() {
   //TODO: update with new logger once available
+  var tester = document.getElementById('name').value
+  var testFeedback = document.getElementById('feedback').value
+  var testEnv = JSON.stringify(window.DATA['responses'].init.user_environment);
+  log(testFeedback, 'User Feedback')
   text = window.DATA.log.join('\n')
+
   var strconfirm = confirm("Are you sure you want to submit the report?");
   if (strconfirm == true) {
-    var tester = document.getElementById('name').value
     session.userName = tester
-    var testEnv = JSON.stringify(window.DATA['responses'].init.user_environment);
     var url = '/receiveData';
     var data = {
       testerName: tester,
       testerEnv: testEnv,
+      testerFeedback: testFeedback,
       fileData: text
     };
 
@@ -374,7 +378,7 @@ function clearSession(slide, callback) {
     callback(slide)
   }).catch(err => {
     // TODO: The logger should take the responsility of updating the error alerts.
-    log("Error:"+ err, slide.id);
+    log("Error:" + err, slide.id);
     let friendlyUserError = `An application error occurred. Please make sure Cytoscape application is running and try again. Click the Log button for more details.`
     updateError(friendlyUserError, "Error!");
   })

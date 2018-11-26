@@ -30,15 +30,31 @@ router.get('/', (req, res) => {
 
 app.post('/receiveData', urlencodedParser, (req, res) => {
 
-  var testerName = JSON.stringify(req.body.testerName)
-  var testerEnv = JSON.stringify(req.body.testerEnv)
-  var fileData = JSON.stringify(req.body.fileData)
+  var testerName = req.body.testerName
+  var testerEnv = req.body.testerEnv
+  var testerFeedback = req.body.testerFeedback
+  var fileData = req.body.fileData
   var summary = testerEnv + ', Tester: ' + testerName;
   // submit a request to create a jira ticket issue id, we will then call SendJiraAttach to attach the generated report file
   // define Jira tickets parameters
   request_data = {
     "fields": {
       "summary": summary,
+      "description": {
+          "type": "doc",
+          "version": 1,
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": testerFeedback
+                }
+              ]
+            }
+          ]
+        },
       "project":
       {
         "id": "10101"
@@ -80,7 +96,6 @@ app.post('/receiveData', urlencodedParser, (req, res) => {
     res.send('OK');
   });
 });
-
 
 
 // REGISTER OUR ROUTES -------------------------------
