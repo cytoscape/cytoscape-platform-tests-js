@@ -33,20 +33,56 @@ class CyCaller {
   }
 
   request (method, url, data, callback) {
-    const Http = new XMLHttpRequest()
-    Http.open(method, url)
-    Http.setRequestHeader('Content-type', 'application/json')
-    Http.setRequestHeader('Accept', 'application/json')
-    Http.send(data)
-    Http.onreadystatechange = (e) => {
-      if (Http.readyState === 4) {        
-				const resp = Http.responseText
-				if (this.log){
-					this.log(resp.substr(0, 300) + '...', 'response')
-				}
-        callback(resp)
+    let _this = this;
+    return new Promise((resolve, reject)=>{
+      const Http = new XMLHttpRequest();
+      try{
+        Http.open(method, url);
+        Http.setRequestHeader('Content-type', 'application/json');
+        Http.setRequestHeader('Accept', 'application/json');
+        Http.onerror = function (err) {
+          let resp = Http.responseText
+          if(resp == ""){
+            resp = "Unknown Error Occured. Server response not received.";
+          }
+          if (_this.log){
+            _this.log(resp.substr(0, 300) + '...', 'response')
+          }
+          reject(resp);
+        };
+  
+        Http.onload = function () {
+          const resp = Http.responseText
+          if (this.log){
+            this.log(resp.substr(0, 300) + '...', 'response')
+          }
+          if (this.status >= 200 && this.status < 300) {
+            resolve(Http.response);
+            callback(resp)
+          } else {
+            reject({
+              status: this.status,
+              statusText: Http.statusText
+            });
+          }
+        };
+        Http.send(data);
+        // Http.onreadystatechange = (e) => {
+        //   if (Http.readyState === 4) {        
+        //     const resp = Http.responseText
+        //     if (this.log){
+        //       this.log(resp.substr(0, 300) + '...', 'response')
+        //     }
+        //     // resolve(resp);
+        //     callback(resp)
+        //   }
+        // }
+      }catch(err){
+        if (_this.log){
+          _this.log(err.substr(0, 300) + '...', 'response')
+        }
       }
-    }
+    });
   }
 
   _execute (http_method, endpoint, data, callback) {
@@ -68,7 +104,7 @@ class CyCaller {
       data = null
     }
 
-    this.request(http_method,
+    return this.request(http_method,
       url,
       data,
       callback)
@@ -101,14 +137,15 @@ class CyCaller {
 
   load_file_from_url (url, callback) {
     const body = [{ 'source_location': url, 'source_method': 'GET' }]
-    this.post('/v1/networks?source=url&format=cx', body, function (r) {
+    return this.post('/v1/networks?source=url&format=cx', body, function (r) {
       const data = JSON.parse(r)
       const suid = data[0]['networkSUID']
       callback(suid)
+      return suid;
     })
   }
 
   get_network_suid (callback) {
-    this.get('/v1/networks', callback)
+    return this.get('/v1/networks', callback)
   }
 }

@@ -10,13 +10,11 @@ var bodyParser = require('body-parser');
 const request = require('request-promise');
 var testHarnessPath = "./src/app";
 var port = process.env.PORT || 8080;        // set our port
-var fs = require('fs');
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
 
 // ROUTES FOR OUR API
 // =============================================================================
@@ -61,21 +59,13 @@ router.get('/SubmitJira', function (req, res) {
 
   request(options).then(function (response) {
     let key = response.key;
-    SendJiraAttach(key, reportData);
-    console.log(key)
+    SendJiraAttach(key, fileData);
     res.send(response)
     res.status(200).json(response);
-
   })
     .catch(function (err) {
       console.log(err);
     })
-});
-
-router.get('/addAttach', function (req, res) {
-  var issueID= 'CRT-6'
-var resp = SendJiraAttach(issueID)
-res.send(resp)
 });
 
 
@@ -85,18 +75,18 @@ app.use('/api', router);
 app.use('/', express.static(testHarnessPath));
 
 // send attachment
-function SendJiraAttach(issueID, reportData) {
+function SendJiraAttach(key, data){
   var options = {
-    url: 'https://cytoscape.atlassian.net/rest/api/3/issue/' + issueID + '/attachments',
+    url: 'https://cytoscape.atlassian.net/rest/api/3/issue/' + key + '/attachments',
     headers: {
-      'Content-Type': 'application/json',
+      // 'Content-Type': 'application/json',
       'Accept': 'application/json',
       'Authorization': 'Basic a291aXNzYXJAZ21haWwuY29tOmppcmFzdWNrcw==',
       'X-Atlassian-Token': 'nocheck'
     }
   };
 
-  var r = request.post(options, function (err, res, body) {
+  var req = request.post(options, function (err, res, body) {
     if (err) {
       console.error(err);
       res.status(500).json({
@@ -108,12 +98,15 @@ function SendJiraAttach(issueID, reportData) {
       console.log(JSON.stringify(body))
       return res
     }
-  }
-  );
-  
-  var form = r.form();
-  form.append('file', fs.createReadStream('filetobeuploaded'));
+  });
+  var form = req.form();
+  form.append('file', data, {
+    filename: 'test.txt',
+    contentType: 'text/plain'
+
+    });
 }
+
 
 
 // START THE SERVER

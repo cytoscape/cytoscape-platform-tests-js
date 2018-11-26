@@ -17,8 +17,14 @@
   <!-- Theme used for syntax highlighting of code -->
   <link rel="stylesheet" href="lib/css/zenburn.css">
   <link rel="stylesheet" href="css/main.css">
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <script src="https://cdn.jsdelivr.net/npm/ua-parser-js@0/dist/ua-parser.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
   <script src="js/cycaller.js"></script>
   <script src="js/slides/session.js"></script>
@@ -38,9 +44,15 @@
     <div id="log-div">
       <div id="log-button-container">
         <input type="button" id="log-button" onClick="toggleLog()" value="LOG"/>
-        <!-- <input type="button" id="jiraBtn" onClick="submitReport()" value="Jira"/>
-        <input type="button" id="jiraBtn2" onClick="attach()" value="Attach"/> -->
-
+      </div>
+      <div id="error-container" style="display:none">
+          <div class="alert alert-danger ">
+              <a href="#" class="close" aria-label="close" onClick="toggleError()" >&times;</a>
+              <div id="error-txt">
+                <strong class="error-level">Danger!</strong> 
+                <p class="error-message">&emsp;Oops, something went wrong! <br/>
+                &emsp;Please ensure Cytoscape application is running and try again. Click Log button for details.</p></div>
+          </div>
       </div>
       <div id="log-container" style="display:none">
         <textarea id="log"></textarea>
