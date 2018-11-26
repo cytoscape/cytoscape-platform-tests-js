@@ -27,17 +27,17 @@ function close_session(slide) {
 function galfiltered(slide) {
   const url = GALFILTERED
   cyCaller.load_file_from_url(url, function (suid) {
-    log('Loaded galfiltered with SUID ' + suid, slide.id)
+    session.log('Loaded galfiltered with SUID ' + suid, slide.id)
     cyCaller.get('/v1/networks/' + suid + '/edges', function (edges) {
       edges = JSON.parse(edges)
-      log('Edges in galfiltered = ' + edges.length, slide.id)
+      session.log('Edges in galfiltered = ' + edges.length, slide.id)
       addResponse(slide.id)
 
       const check = slide.getElementsByClassName('edgeCountMatches')[0]
       check.labels[0].innerText = 'Edge count is ' + edges.length + '?'
       cyCaller.get('/v1/networks/' + suid + '/nodes', function (nodes) {
         nodes = JSON.parse(nodes)
-        log('Nodes in galfiltered = ' + nodes.length, slide.id)
+        session.log('Nodes in galfiltered = ' + nodes.length, slide.id)
         addResponse(slide.id, {
           'cyrestNodeCount': nodes.length,
           'cyrestEdgeCount': edges.length
@@ -122,7 +122,7 @@ function toggle_tests(vis) {
 }
 
 function runjasmine(slide) {
-  log(JSON.stringify(window.DATA['responses']), slide.id)
+  session.log(JSON.stringify(window.DATA['responses']), slide.id)
   window.runtests()
 }
 
@@ -407,7 +407,7 @@ function call(slide) {
     'submit': submit_slide
   }
   
-  log('Starting slide', slide.id)
+  session.log('Starting slide', slide.id)
   if (funcs.hasOwnProperty(slide.id)) {
     // initialize slide settings for navigation control, current page vs total page, and progress bar
     Reveal.configure({ controls: false, slideNumber: 'c/t', progress: true })
