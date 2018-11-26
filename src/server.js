@@ -130,7 +130,7 @@ function SendJiraAttach(key, data) {
   });
   var form = req.form();
   form.append('file', data, {
-    filename: 'test.txt',
+    filename: 'CytoscapeTestHarness.log',
     contentType: 'text/plain'
   });
 }
