@@ -14,7 +14,7 @@ class TestSession {
         this._userInformation.OS = ua.os;
         this._userInformation.browser = ua.browser;
         this.sessionLog = [];
-        this.cylog = new CyLogger();
+        let cylog = new CyLogger();
 
     }
 
@@ -34,7 +34,7 @@ class TestSession {
      * Opens up the session, performing the necessary steps to set things up.
      */
     open() {
-        this.cylog.log("Opening session", this.sessionId);
+        console.log("Opening session", this.sessionId);
         /**
          * Time in (ms) that the session was started.
          */
@@ -45,7 +45,7 @@ class TestSession {
      * Closes and cleans up a test session.
      */
     close() {
-        this.cylog.log("Closing session", this.sessionId);
+        cylog.log("Closing session", this.sessionId);
         /**
          * Time in (ms) that the session was started.
          */
@@ -53,7 +53,7 @@ class TestSession {
     }
 
     print() {
-        this.cylog.debug(JSON.stringify(this));
+        console.debug(JSON.stringify(this));
     }
 
     /**
@@ -63,9 +63,9 @@ class TestSession {
      */
     log(message, context = 'info'){
         const line = context + ' :: ' + message
-        this.sessionLog.push(line);
+        cylog.logItems.push(line);
         const log = document.getElementById('log')
-        log.innerHTML =  this.cylog.logItems.join('\n')
+        log.innerHTML =  cylog.logItems.join('\n')
         log.scrollTop = log.scrollHeight
     }
 
