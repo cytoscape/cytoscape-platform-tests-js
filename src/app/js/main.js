@@ -35,7 +35,7 @@ function updateError(err, level = "Critical!") {
 window.onerror = function (errorMsg, url, lineNumber) {
   updateError();
   log('Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber);
-}
+  }
 
 function init(slide) {
   console.debug("Main init", slide, session);
@@ -381,6 +381,7 @@ function clearSession(slide, callback) {
     log("Error:" + err, slide.id);
     let friendlyUserError = `An application error occurred. Please make sure Cytoscape application is running and try again. Click the Log button for more details.`
     updateError(friendlyUserError, "Error!");
+    Reveal.configure({ controls: false })
   })
 }
 
