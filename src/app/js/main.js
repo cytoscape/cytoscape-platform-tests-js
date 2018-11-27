@@ -214,12 +214,13 @@ function sendData() {
         'Content-Type': 'application/json'
       }
     }).then(res => res.json())
-      .then(response => log('Uploaded the test report Successfully to Jira', JSON.stringify(response)))
-      .catch(error => log('Failed to Upload the test report to Jira:', error));
+      .then(response => alert("Report Submitted Successfully. Jira ID: " + response.key))
+      
+      .catch(error => alert('Failed to Upload the test report to Jira:' + error));
   }
 }
 
-
+//log('Uploaded the test report Successfully to Jira', JSON.stringify(response))
 /* File drop area */
 function handleCYS(files) {
   addResponse('session_save', { 'file_size': files[0].size })
