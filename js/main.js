@@ -19,7 +19,6 @@ function init(slide) {
 
 /* SLIDES */
 function close_session(slide) {
-  session.info("This is an info log being tested!!!!!!!!!!!!")
   cyCaller.delete('/v1/session', {}, function (r) {
     showControls(slide)
   })
@@ -28,7 +27,7 @@ function close_session(slide) {
 function galfiltered(slide) {
   const url = GALFILTERED
   cyCaller.load_file_from_url(url, function (suid) {
-    session.log('Loaded galfiltered with SUID TTT' + suid, slide.id)
+    session.log('Loaded galfiltered with SUID ::TTT::' + suid, slide.id)
     cyCaller.get('/v1/networks/' + suid + '/edges', function (edges) {
       edges = JSON.parse(edges)
       session.log('Edges in galfiltered = ' + edges.length, slide.id)
@@ -464,10 +463,9 @@ Reveal.addEventListener('slidechanged', function (event) {
 })
 
 // Creating the test session instance for the user.
-//const session = new TestSession();
-const session = new CyLogger();
+const session = new TestSession();
 const cyCaller = new CyCaller()
 // Setting the logger callback to the session log.
-session.setLogCallBack(session.log)
+cyCaller.setLogCallBack(session.log)
 setTimeout(() => { call(Reveal.getSlide(0)) }, 500)
 //log('Started Cytoscape Testing', 'init')

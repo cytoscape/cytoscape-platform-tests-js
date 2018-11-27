@@ -29,7 +29,7 @@ class TestSession {
     set userName(name){
         this._userInformation.name = name;
     }
-    
+
     /**
      * Opens up the session, performing the necessary steps to set things up.
      */
@@ -53,7 +53,7 @@ class TestSession {
     }
 
     print() {
-        cthis.cylog.debug(JSON.stringify(this));
+        this.cylog.debug(JSON.stringify(this));
     }
 
     /**
@@ -65,7 +65,7 @@ class TestSession {
         const line = context + ' :: ' + message
         this.sessionLog.push(line);
         const log = document.getElementById('log')
-        log.innerHTML =  this.sessionLog.join('\n')
+        log.innerHTML =  this.cylog.logItems.join('\n')
         log.scrollTop = log.scrollHeight
     }
 
