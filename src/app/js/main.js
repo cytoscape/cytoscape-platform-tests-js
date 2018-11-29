@@ -23,8 +23,7 @@ function updateError(err, level = "Critical!") {
   if (err) {
     errMessage.text(err);
   } else {
-    errMessage.text('Oops, something went wrong!' + '<br/>'
-      + 'Please ensure Cytoscape application is running and try again. Click Log button for details.')
+    errMessage.text('Oops, something went wrong! Please ensure Cytoscape application is running and try again. Click Log button for details.')
   }
   errLevel.text(level);
 
