@@ -27,8 +27,11 @@ var Logger = (function () {
                     log.innerHTML = this.logItems.join('\n')
                     log.scrollTop = log.scrollHeight
         },
-        writeSlidetoLog:function(BaseSlide){
+        addSlidetoLog:function(BaseSlide){
             this.logItems.push(BaseSlide);
+        },
+        writeSlidestoLog:function(){
+            //write to file? What do we want?
         },
         logItems: []
       };
