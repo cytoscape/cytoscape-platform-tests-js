@@ -11,8 +11,36 @@ const request = require('request-promise');
 var urlencodedParser = bodyParser.urlencoded({ limit: '50mb', extended: true });
 var testHarnessPath = "./src/app";
 var port = process.env.PORT || 8080;        // set our port
+const dotenv = require('dotenv');
+const config = dotenv.config();
+var apiKey =  "";
+var jiraURL = "";
 
+if(!config || config.error){
+  console.error("No .env file found in the root of the directory. Plase add a .env file.");
+  throw result.error;
+}
+if(!config.parsed.JIRA_API_KEY || config.parsed.JIRA_API_KEY.trim() == "" || config.parsed.JIRA_API_KEY.trim() == "[PLACE YOUR TOKEN HERE]"){
+  console.error(`\n The .env file in the root of the directory is missing an entry for JIRA_API_KEY. \n 
+  Please add an entry in the file for JIRA_API_KEY. \n
+  To do so, copy and past the following in the .env file along with a valid API token string at the end: \N
+  JIRA_API_KEY="[PLACE YOUR TOKEN HERE]" \n
+  Be sure to replace [PLACE YOUR TOKEN HERE], including the brackets, with your valid API token.
+  `);
+  throw new Error("Missing JIRA_API_KEY in .env");
+}
+apiKey = config.parsed.JIRA_API_KEY;
 
+if(!config.parsed.JIRA_URL || config.parsed.JIRA_URL.trim() == ""){
+   console.error(`\n The .env file in the root of the directory is missing or has an invalid entry for JIRA_URL. \n 
+  Please add an entry in the file for JIRA_URL. \n
+  To do so, copy and past the following in the .env file: \N
+  JIRA_URL="https://cytoscape.atlassian.net/rest/api/3/issue/" \n
+  `);
+  throw new Error("Missing or invalid url for JIRA_URL in .env");
+}
+
+jiraURL = config.parsed.JIRA_URL;
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -67,13 +95,13 @@ app.post('/receiveData', urlencodedParser, (req, res) => {
 
   const options = {
     method: 'POST',
-    uri: 'https://cytoscape.atlassian.net/rest/api/3/issue',
+    uri: jiraURL,
     body: request_data,
     json: true,
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Authorization': 'Basic a291aXNzYXJAZ21haWwuY29tOmppcmFzdWNrcw=='
+      'Authorization': `Basic ${apiKey}`
     }
   }
 
@@ -106,11 +134,11 @@ app.use('/', express.static(testHarnessPath));
 //send attachment
 function SendJiraAttach(key, data) {
   var options = {
-    url: 'https://cytoscape.atlassian.net/rest/api/3/issue/' + key + '/attachments',
+    url: `${jiraURL}${key}/attachments`,
     headers: {
       // 'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Authorization': 'Basic a291aXNzYXJAZ21haWwuY29tOmppcmFzdWNrcw==',
+      'Authorization': `Basic ${apiKey}`,
       'X-Atlassian-Token': 'nocheck'
     }
   };
