@@ -14,7 +14,6 @@ class TestSession {
         this._userInformation.OS = ua.os;
         this._userInformation.browser = ua.browser;
         this.sessionLog = [];
-        let cylog = new CyLogger();
 
     }
 
