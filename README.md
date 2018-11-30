@@ -133,7 +133,7 @@ If the previous block was run in a terminal, skip to step 7 and only execute ste
    $ npm run build
    ```
 
-1.  Open the .env file, located at the root of the project and ensure that there exists entires for the `JIRA_API_KEY` and `JIRA_URL`. If not copy and paste the following into the file:
+1.  Open the .env file, located at the root of the project and ensure that there exists entries for the `JIRA_API_KEY` and `JIRA_URL`. If not copy and paste the following into the file:
     ```sh
     JIRA_API_KEY="[PLACE YOUR TOKEN HERE]"
     JIRA_URL="https://cytoscape.atlassian.net/rest/api/3/issue/"'
