@@ -61,24 +61,9 @@ class CyCaller {
             if(callback) {
               callback(resp)
             }
-          // } else {
-          //   reject({
-          //     status: this.status,
-          //     statusText: resp
-          //   });
           }
         };
         Http.send(data);
-        // Http.onreadystatechange = (e) => {
-        //   if (Http.readyState === 4) {        
-        //     const resp = Http.responseText
-        //     if (this.log){
-        //       this.log(resp.substr(0, 300) + '...', 'response')
-        //     }
-        //     // resolve(resp);
-        //     callback(resp)
-        //   }
-        // }
       }catch(err){
         if (_this.log){
           _this.log(err.substr(0, 300) + '...', 'response')
