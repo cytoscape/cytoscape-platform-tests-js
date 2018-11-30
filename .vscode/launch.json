@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}\\js\\reveal.js"
+            "program": "${workspaceFolder}\\src\\server.js"
         },
         {
             "type": "node",

@@ -130,7 +130,7 @@ If the previous block was run in a terminal, skip to step 8 and only execute tha
 
 1. Serve the presentation and monitor source files for changes
    ```sh
-   $ npm start
+   $ npm run start:server
    ```
    or
    ```sh
