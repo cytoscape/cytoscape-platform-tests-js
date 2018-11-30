@@ -56,14 +56,16 @@ class CyCaller {
           if (this.log){
             this.log(resp.substr(0, 300) + '...', 'response')
           }
-          if (this.status >= 200 && this.status < 300) {
-            resolve(Http.response);
-            callback(resp)
-          } else {
-            reject({
-              status: this.status,
-              statusText: Http.statusText
-            });
+          if (Http.readyState === 4) {
+            resolve(resp);
+            if(callback) {
+              callback(resp)
+            }
+          // } else {
+          //   reject({
+          //     status: this.status,
+          //     statusText: resp
+          //   });
           }
         };
         Http.send(data);
@@ -140,7 +142,9 @@ class CyCaller {
     return this.post('/v1/networks?source=url&format=cx', body, function (r) {
       const data = JSON.parse(r)
       const suid = data[0]['networkSUID']
-      callback(suid)
+      if(callback){
+        callback(suid)
+      }
       return suid;
     })
   }
