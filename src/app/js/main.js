@@ -1,7 +1,10 @@
+
+
 window.DATA = { 'log': [], 'responses': {} }
 
 const GALFILTERED = 'https://raw.githubusercontent.com/cytoscape/cytoscape-platform-tests-js/master/networks/galFiltered.cx'
 var configurationData;
+
 
 function toggleLog() {
   const log = document.getElementById('log-container');
@@ -34,7 +37,8 @@ function updateError(err, level = "Critical!"){
 // catch all javascript errors and display them on the screen
 window.onerror = function (errorMsg, url, lineNumber) {
   updateError();
-  log('Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber);
+  Logger.getInstance().log('Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber);
+  //log('Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber);
 }
 
 function init(slide) {
@@ -155,8 +159,8 @@ function toggle_tests(vis) {
 }
 
 function runjasmine(slide) {
-  session.log(JSON.stringify(window.DATA['responses']), slide.id)
-  window.runtests()
+  Logger.getInstance().log(JSON.stringify(window.DATA['responses']), slide.id);
+  window.runtests();
 }
 
 function feedback(slide) {
@@ -390,8 +394,8 @@ function call(slide) {
     'close_cytoscape': close_cytoscape_slide,
     'submit': submit_slide
   }
-  
-  session.log('Starting slide', slide.id)
+  Logger.getInstance().log('Starting slide',slide.id);
+  //session.log('Starting slide', slide.id)
   if (funcs.hasOwnProperty(slide.id)) {
     // initialize slide settings for navigation control, current page vs total page, and progress bar
     Reveal.configure({ controls: false, slideNumber: 'c/t', progress: true })

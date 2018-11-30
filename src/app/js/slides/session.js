@@ -55,18 +55,18 @@ class TestSession {
         console.debug(JSON.stringify(this));
     }
 
-    /**
-     * Adds the message to the test session log.
-     * @param {*} message 
-     * @param {*} context 
-     */
-    log(message, context = 'info'){
-        const line = context + ' :: ' + message
-        cylog.logItems.push(line);
-        const log = document.getElementById('log')
-        log.innerHTML =  cylog.logItems.join('\n')
-        log.scrollTop = log.scrollHeight
-    }
+    // /**
+    //  * Adds the message to the test session log.
+    //  * @param {*} message 
+    //  * @param {*} context 
+    //  */
+    // log(message, context = 'info'){
+    //     const line = context + ' :: ' + message
+    //     cylog.logItems.push(line);
+    //     const log = document.getElementById('log')
+    //     log.innerHTML =  cylog.logItems.join('\n')
+    //     log.scrollTop = log.scrollHeight
+    // }
 
 }
 
