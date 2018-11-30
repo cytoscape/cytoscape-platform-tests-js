@@ -33,7 +33,8 @@ class TestSession {
      * Opens up the session, performing the necessary steps to set things up.
      */
     open() {
-        console.log("Opening session", this.sessionId);
+       Logger.getInstance().log("Opening Session", this.sessionId);
+        // console.log("Opening session", this.sessionId);
         /**
          * Time in (ms) that the session was started.
          */
@@ -44,7 +45,8 @@ class TestSession {
      * Closes and cleans up a test session.
      */
     close() {
-        cylog.log("Closing session", this.sessionId);
+        Logger.getInstance().log("Closing session",this.sessionId);
+        //cylog.log("Closing session", this.sessionId);
         /**
          * Time in (ms) that the session was started.
          */

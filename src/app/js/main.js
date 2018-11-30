@@ -64,17 +64,19 @@ function close_session(slide) {
 function galfiltered(slide) {
   const url = GALFILTERED
   cyCaller.load_file_from_url(url, function (suid) {
-    session.log('Loaded galfiltered with SUID ' + suid, slide.id)
+    Logger.getInstance().log('Loaded galfiltered with SUID ' + suid, slide.id);
+    //session.log('Loaded galfiltered with SUID ' + suid, slide.id)
     cyCaller.get('/v1/networks/' + suid + '/edges', function (edges) {
       edges = JSON.parse(edges)
-      session.log('Edges in galfiltered = ' + edges.length, slide.id)
+      Logger.getInstance().log('Edges in galfiltered = ' + edges.length, slide.id);
+      //session.log('Edges in galfiltered = ' + edges.length, slide.id)
       addResponse(slide.id)
 
       const check = slide.getElementsByClassName('edgeCountMatches')[0]
       check.labels[0].innerText = 'Edge count is ' + edges.length + '?'
       cyCaller.get('/v1/networks/' + suid + '/nodes', function (nodes) {
         nodes = JSON.parse(nodes)
-        session.log('Nodes in galfiltered = ' + nodes.length, slide.id)
+        Logger.getInstance().log('Nodes in galfiltered = ' + nodes.length, slide.id)
         addResponse(slide.id, {
           'cyrestNodeCount': nodes.length,
           'cyrestEdgeCount': edges.length
@@ -481,6 +483,6 @@ Reveal.addEventListener('slidechanged', function (event) {
 const session = new TestSession();
 const cyCaller = new CyCaller()
 // Setting the logger callback to the session log.
-cyCaller.setLogCallBack((message, context) => session.log(message, context));
+cyCaller.setLogCallBack((message, context) => Logger.getInstance().log(message, context));
 setTimeout(() => { call(Reveal.getSlide(0)) }, 500)
 //log('Started Cytoscape Testing', 'init')
