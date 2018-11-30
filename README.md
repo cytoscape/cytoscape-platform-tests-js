@@ -172,15 +172,6 @@ TBD
 - **src/app/plugin/** Components that have been developed as extensions to reveal.js
 - **src/app/lib/** All other third party assets (JavaScript, CSS, fonts)
 
-**The following directories are deprecated**
-- **docs/** The compiled reveal.js slides webapp
-- **js/cycaller.js** The Cytoscape platform testing Javascript API
-- **networks/** Cytoscape network files for testing
-- **spec/** The Jasmine spec file describing automated tests
-- **plugin/** Components that have been developed as extensions to reveal.js
-- **css** CSS files for the harness UI
-
-
 
 ## Issues
 
