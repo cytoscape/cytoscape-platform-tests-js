@@ -224,7 +224,9 @@ body {
     cursor: pointer;
     color: currentColor;
     transform: scale(0.9999);
-    transition: color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+    transition: color 0.2s ease,
+ opacity 0.2s ease,
+ transform 0.2s ease;
     z-index: 2;
     pointer-events: auto;
     font-size: inherit;
@@ -373,7 +375,7 @@ body {
 .reveal .progress {
   position: absolute;
   display: none;
-  height: 3px;
+  height: 12px;
   width: 100%;
   bottom: 0;
   left: 0;
@@ -402,11 +404,11 @@ body {
 .reveal .slide-number {
   position: absolute;
   display: block;
-  right: 8px;
-  bottom: 8px;
+  left: 12px;
+  bottom: 16px;
   z-index: 31;
   font-family: Helvetica, sans-serif;
-  font-size: 12px;
+  font-size: 18px;
   line-height: 1;
   color: #fff;
   background-color: rgba(0, 0, 0, 0.4);
