@@ -23,8 +23,7 @@ function updateError(err, level = "Critical!") {
   if (err) {
     errMessage.text(err);
   } else {
-    errMessage.text('Oops, something went wrong!' + '<br/>'
-      + 'Please ensure Cytoscape application is running and try again. Click Log button for details.')
+    errMessage.text('Oops, something went wrong! Please ensure Cytoscape application is running and try again. Click Log button for details.')
   }
   errLevel.text(level);
 
@@ -68,7 +67,7 @@ function galfiltered(slide) {
       addResponse(slide.id)
 
       const check = slide.getElementsByClassName('edgeCountMatches')[0]
-      check.labels[0].innerText = 'Edge count is ' + edges.length + '?'
+      check.innerText = 'Edge count is ' + edges.length + '?'
       cyCaller.get('/v1/networks/' + suid + '/nodes', function (nodes) {
         nodes = JSON.parse(nodes)
         log('Nodes in galfiltered = ' + nodes.length, slide.id)
@@ -78,7 +77,7 @@ function galfiltered(slide) {
         })
 
         const check = slide.getElementsByClassName('nodeCountMatches')[0]
-        check.labels[0].innerText = 'Node count is ' + nodes.length + '?'
+        check.innerText = 'Node count is ' + nodes.length + '?'
         showControls(slide)
       })
     })
@@ -215,12 +214,13 @@ function sendData() {
         'Content-Type': 'application/json'
       }
     }).then(res => res.json())
-      .then(response => log('Uploaded the test report Successfully to Jira', JSON.stringify(response)))
-      .catch(error => log('Failed to Upload the test report to Jira:', error));
+      .then(response => alert("Report Submitted Successfully. Jira ID: " + response.key))
+      
+      .catch(error => alert('Failed to Upload the test report to Jira:' + error));
   }
 }
 
-
+//log('Uploaded the test report Successfully to Jira', JSON.stringify(response))
 /* File drop area */
 function handleCYS(files) {
   addResponse('session_save', { 'file_size': files[0].size })
@@ -343,12 +343,12 @@ function buildInput(n) {
   let entry = ''
   if (n['type'] === 'checkbox') {
     entry = "<input type='checkbox' class='custom-control-input' id='" + n['id'] + "' class='" + n['id'] + "'/>" +
-      "<label for='" + n['id'] + "'>" + n['text'] + '</label>'
+      `<label class='${n['id']}' for='` + n['id'] + "'>" + n['text'] + '</label>'
   } else if (n['type'] === 'text') {
-    entry = "<label for='" + n['id'] + "'>" + n['text'] + '</label>' +
+    entry = `<label class='${n['id']}' for='` + n['id'] + "'>" + n['text'] + '</label>' +
       "<input type='text' id='" + n['id'] + "'' name='" + n['id'] + "'/>"
   } else if (n['type'] === 'textarea') {
-    entry = "<label for='" + n['id'] + "'>" + n['text'] + '</label>' +
+    entry = `<label class='${n['id']}' for='` + n['id'] + "'>" + n['text'] + '</label>' +
       "<textarea id='" + n['id'] + "'' name='" + n['id'] + "'></textarea>"
   } else {
     entry = "<input type='" + n['type'] + "' id='" + n['id'] + "' class='" + n['id'] + "'/>"
