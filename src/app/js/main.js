@@ -11,7 +11,7 @@ function toggleLog() {
   log.style.display = log.style.display === 'none' ? 'block' : 'none';
 }
 
-async function loadConfiguration(){
+async function loadConfiguration() {
   const config = await fetch("../TestHarnessConfig.JSON");
   return await config.json();
 }
@@ -19,15 +19,14 @@ function toggleError() {
   const log = document.getElementById('error-container')
   log.style.display = log.style.display === 'none' ? 'block' : 'none'
 }
-function updateError(err, level = "Critical!"){
+function updateError(err, level = "Critical!") {
   const errLog = document.getElementById('error-container')
   let errMessage = $($.find(".error-message")[0]);
   let errLevel = val = $($.find(".error-level")[0]);
-  if(err){
+  if (err) {
     errMessage.text(err);
-  }else{
-    errMessage.text( '&emsp;Oops, something went wrong!' + '<br/>'
-    + '&emsp;Please ensure Cytoscape application is running and try again. Click Log button for details.')
+  } else {
+    errMessage.text('Oops, something went wrong! Please ensure Cytoscape application is running and try again. Click Log button for details.')
   }
   errLevel.text(level);
 
@@ -38,6 +37,8 @@ function updateError(err, level = "Critical!"){
 window.onerror = function (errorMsg, url, lineNumber) {
   updateError();
   Logger.getInstance().log('Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber);
+  Reveal.configure({ controls: false })
+
   //log('Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber);
 }
 
@@ -47,11 +48,11 @@ function init(slide) {
   var testDate = new Date();
   loadConfiguration().then(data => {
     configurationData = data;
+    addResponse(slide.id, { 'test_date': testDate })
+    // define user environment information: OS and browser version and add to response
+    addResponse(slide.id, { 'user_environment': window.navigator['appVersion'] })
+    showControls(slide);
   });
-  addResponse(slide.id, { 'test_date': testDate })
-  // define user environment information: OS and browser version and add to response
-  addResponse(slide.id, { 'user_environment': window.navigator['appVersion'] })
-  showControls(slide);
 }
 
 /* SLIDES */
@@ -73,7 +74,7 @@ function galfiltered(slide) {
       addResponse(slide.id)
 
       const check = slide.getElementsByClassName('edgeCountMatches')[0]
-      check.labels[0].innerText = 'Edge count is ' + edges.length + '?'
+      check.innerText = 'Edge count is ' + edges.length + '?'
       cyCaller.get('/v1/networks/' + suid + '/nodes', function (nodes) {
         nodes = JSON.parse(nodes)
         Logger.getInstance().log('Nodes in galfiltered = ' + nodes.length, slide.id)
@@ -83,7 +84,7 @@ function galfiltered(slide) {
         })
 
         const check = slide.getElementsByClassName('nodeCountMatches')[0]
-        check.labels[0].innerText = 'Node count is ' + nodes.length + '?'
+        check.innerText = 'Node count is ' + nodes.length + '?'
         showControls(slide)
       })
     })
@@ -141,7 +142,7 @@ function session_save(slide) {
         })
       }
     })
-  })
+  });
 }
 
 function toggle_tests(vis) {
@@ -186,38 +187,47 @@ function submit_slide(slide) {
   text = window.DATA.log.join('\n')
   element.style = 'font-size: 22px'
   element.innerHTML = '<a href="data:text/plain;charset=utf-8,' +
-    encodeURIComponent(text) + '" download="Cytoscape_Testing_results.txt">Download testing results</a>' +
-    '<br/> and <br/>' +
-    '<button type="submit" id="jiraBtn" onclick="submitReport()">Submit Jira Report</button>'
+    encodeURIComponent(text) + '" download="Cytoscape_Testing_results.txt">Download Test Results</a>' +
+    '<br/> <br/>' +
+    '<button type="submit" id="jiraBtn" class="btn btn-primary" onclick="sendData()">Submit Jira Report</button>'
 
   slide.appendChild(element)
 }
 
-// call our server rest api 
-function submitReport() {
+// Process report submission to the server
+function sendData() {
+  //TODO: update with new logger once available
+  var tester = document.getElementById('name').value
+  var testFeedback = document.getElementById('feedback').value
+  var testEnv = JSON.stringify(window.DATA['responses'].init.user_environment);
+  log(testFeedback, 'User Feedback')
   text = window.DATA.log.join('\n')
+
   var strconfirm = confirm("Are you sure you want to submit the report?");
   if (strconfirm == true) {
-    var userFeedback = document.getElementById('feedback').value
-    addResponse('user_feedback', { 'feedback': userFeedback })
-    var tester = document.getElementById('name').value
     session.userName = tester
-    var env = JSON.stringify(window.DATA['responses'].init.user_environment)
-    var req_url = '/api/SubmitJira?env=' + env + '&tester=' + tester + '&fileData=' + text
+    var url = '/receiveData';
+    var data = {
+      testerName: tester,
+      testerEnv: testEnv,
+      testerFeedback: testFeedback,
+      fileData: text
+    };
 
-    fetch(req_url, { method: 'GET' })
-      .then((resp) => resp.json())
-      .then(function (data) {
-        log('Jira report submission request sent to api server');
-        let id = data.key;
-        log('Jira issue id is: ' + id)
-      })
-      .catch(function (error) {
-        log(error);
-      });
+    fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(res => res.json())
+      .then(response => alert("Report Submitted Successfully. Jira ID: " + response.key))
+      
+      .catch(error => alert('Failed to Upload the test report to Jira:' + error));
   }
 }
 
+//log('Uploaded the test report Successfully to Jira', JSON.stringify(response))
 /* File drop area */
 function handleCYS(files) {
   addResponse('session_save', { 'file_size': files[0].size })
@@ -339,13 +349,13 @@ function addResponse(name, data) {
 function buildInput(n) {
   let entry = ''
   if (n['type'] === 'checkbox') {
-    entry = "<input type='checkbox' id='" + n['id'] + "' class='" + n['id'] + "'/>" +
-      "<label for='" + n['id'] + "'>" + n['text'] + '</label>'
+    entry = "<input type='checkbox' class='custom-control-input' id='" + n['id'] + "' class='" + n['id'] + "'/>" +
+      `<label class='${n['id']}' for='` + n['id'] + "'>" + n['text'] + '</label>'
   } else if (n['type'] === 'text') {
-    entry = "<label for='" + n['id'] + "'>" + n['text'] + '</label>' +
+    entry = `<label class='${n['id']}' for='` + n['id'] + "'>" + n['text'] + '</label>' +
       "<input type='text' id='" + n['id'] + "'' name='" + n['id'] + "'/>"
   } else if (n['type'] === 'textarea') {
-    entry = "<label for='" + n['id'] + "'>" + n['text'] + '</label>' +
+    entry = `<label class='${n['id']}' for='` + n['id'] + "'>" + n['text'] + '</label>' +
       "<textarea id='" + n['id'] + "'' name='" + n['id'] + "'></textarea>"
   } else {
     entry = "<input type='" + n['type'] + "' id='" + n['id'] + "' class='" + n['id'] + "'/>"
@@ -376,9 +386,11 @@ function clearSession(slide, callback) {
     callback(slide)
   }).catch(err => {
     // TODO: The logger should take the responsility of updating the error alerts.
-    log("Error:"+ err, slide.id);
+    log("Error:" + err, slide.id);
     let friendlyUserError = `An application error occurred. Please make sure Cytoscape application is running and try again. Click the Log button for more details.`
     updateError(friendlyUserError, "Error!");
+    //Disabling Controls after the capture of an error
+    Reveal.configure({ controls: false })
   })
 }
 
