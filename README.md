@@ -140,7 +140,7 @@ If the previous block was run in a terminal, skip to step 7 and only execute ste
     ```
     Be sure to replace [PLACE YOUR TOKEN HERE], including the brackets, with your valid API token for Jira.
 
-1. Serve the presentation and monitor source files for changes be doing A or B.
+1. Serve the presentation and monitor source files for changes by doing A or B.
    
    - A
    ```sh
