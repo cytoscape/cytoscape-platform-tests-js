@@ -60,8 +60,6 @@ class TestSession {
     // /**
     //  * Adds the message to the test session log.
     //  * @param {*} message 
-    //  * @param {*} context 
-    //  */
     // log(message, context = 'info'){
     //     const line = context + ' :: ' + message
     //     cylog.logItems.push(line);

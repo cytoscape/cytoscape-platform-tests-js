@@ -30,7 +30,11 @@ var Logger = (function () {
         writeSlidestoLog:function(){
             //write to file? What do we want?
         },
-        logItems: []
+        addDevNote(message, slide, data){
+          this.developmentNotes.push(message + slide + " :" + " " + data);
+        },
+        logItems: [],
+        developmentNotes:[]
       };
   
     };
@@ -51,3 +55,4 @@ var Logger = (function () {
     };
   
   })();
+

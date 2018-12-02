@@ -13,7 +13,8 @@ function init(slide) {
   addResponse(slide.id, { 'test_date': testDate })
   // define user environment information: OS and browser version and add to response
   addResponse(slide.id, { 'user_environment': window.navigator['appVersion'] })
-  showControls(slide)
+  showControls(slide);
+  Logger.getInstance().addDevNote("Main init", slide, session);
   console.debug("Main init", slide, session);
 }
 
