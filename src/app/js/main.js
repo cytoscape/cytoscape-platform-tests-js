@@ -328,13 +328,13 @@ function addResponse(name, data) {
   window.res = Object.assign(window.DATA.responses[name], data)
 }
 
-function log(message, context = 'info') {
-  const line = context + ' :: ' + message
-  window.DATA['log'].push(line)
-  const log = document.getElementById('log')
-  log.innerHTML = window.DATA['log'].join('\n')
-  log.scrollTop = log.scrollHeight
-}
+// function log(message, context = 'info') {
+//   const line = context + ' :: ' + message
+//   window.DATA['log'].push(line)
+//   const log = document.getElementById('log')
+//   log.innerHTML = window.DATA['log'].join('\n')
+//   log.scrollTop = log.scrollHeight
+// }
 
 function buildInput(n) {
   let entry = ''

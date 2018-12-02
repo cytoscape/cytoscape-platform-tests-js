@@ -35,4 +35,5 @@ class CyLogItem {
       `\tStart Date: ${this.startDate}\n ` +
       `\n`;
   }
-}
+};
+

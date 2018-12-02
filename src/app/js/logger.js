@@ -1,3 +1,4 @@
+
 /**
 * This is the logger class containing log items and responsible for holding different log types.
 */
@@ -16,6 +17,14 @@ var Logger = (function () {
         // Public methods and variables
         writeErrorLog: function (message) {
           console.log(message);
+        },
+        writeGenericLog(message,id,slide){
+          var cylogitem = new CyLogItem();
+          cylogitem.uid = id;
+          cylogitem.message = message;
+
+          this.addDevNote(cylogitem);
+
         },
         log: function(message, context = 'info') {
                     const line = context + ' :::: ' + message
@@ -55,4 +64,3 @@ var Logger = (function () {
     };
   
   })();
-
