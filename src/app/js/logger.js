@@ -15,16 +15,34 @@ var Logger = (function () {
       return {
   
         // Public methods and variables
-        writeErrorLog: function (message) {
-          console.log(message);
+        writeErrorLog: function (message,id) {
+          var cylogitem = new CyLogItem();
+          cylogitem.uid = id;
+          cylogitem.message = message;
+          this.addDevNote(cylogitem);
+          this.log(message);
         },
         writeGenericLog(message,id,slide){
           var cylogitem = new CyLogItem();
           cylogitem.uid = id;
           cylogitem.message = message;
-
+          cylogitem.question;
+          if(slide == undefined){
+             cylogitem.slide = "No slide data sent"; 
+          }
           this.addDevNote(cylogitem);
+          this.log(message);
 
+        },
+        writeSlideError(message,slide){ // This funtion will be used when the slideModel is completely implemented. 
+          var cylogitem = new CyLogItem();
+          cylogitem.id = slide.id;
+          cylogitem.expectedAnswer = slide.expectedAnswer;
+          cylogitem.context = typeof(slide);
+          cylogitem.operations = slide.operations;
+          cylogitem.message = message;
+          this.addDevNote(cylogitem);
+          this.log(message,"error");
         },
         log: function(message, context = 'info') {
                     const line = context + ' :::: ' + message
@@ -41,6 +59,17 @@ var Logger = (function () {
         },
         addDevNote(message, slide, data){
           this.developmentNotes.push(message + slide + " :" + " " + data);
+        },
+        exportLogsToFile(){
+         var jsonData=  JSON.stringify(this.developmentNotes);
+         writeFile("./logFile.txt", jsonData, (err) => {
+          if (err) {
+              console.error(err);
+              return;
+          };
+          console.log("File has been created");
+      });
+
         },
         logItems: [],
         developmentNotes:[]

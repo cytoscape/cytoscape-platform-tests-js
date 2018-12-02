@@ -13,7 +13,9 @@ function toggleLog() {
 
 async function loadConfiguration() {
   const config = await fetch("../TestHarnessConfig.JSON");
-  return await config.json();
+  return await config.json().catch((rejected) => {
+    Logger.getInstance().writeGenericLog("Failed to load configuratation file","file init",undefined);
+  });
 }
 function toggleError() {
   const log = document.getElementById('error-container')
@@ -386,7 +388,7 @@ function clearSession(slide, callback) {
     callback(slide)
   }).catch(err => {
     // TODO: The logger should take the responsility of updating the error alerts.
-    log("Error:" + err, slide.id);
+    Logger.getInstance().writeErrorLog("Error:" + err, slide.id);
     let friendlyUserError = `An application error occurred. Please make sure Cytoscape application is running and try again. Click the Log button for more details.`
     updateError(friendlyUserError, "Error!");
     //Disabling Controls after the capture of an error
