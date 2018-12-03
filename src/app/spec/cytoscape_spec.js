@@ -23,7 +23,7 @@ describe("Cytoscape", function() {
       apiVersion: 'v1'
     };
     cyCaller.get("/v1", function(v){
-      log(v, "status")
+      Logger.getInstance().log(v, "status")
       v = JSON.parse(v)
       data = {"allAppsStarted": v['allAppsStarted'], "apiVersion": v['apiVersion']}
       expect(data).toEqual(expectedValue);
@@ -37,7 +37,7 @@ describe("Cytoscape", function() {
       apiVersion: 'v1'
     };
     cyCaller.get("/v1/version", function(v){
-      log(v, "version")
+      Logger.getInstance().log(v, "version")
       v = JSON.parse(v)
       expect(v).toEqual(expectedValue);
       done();

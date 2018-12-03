@@ -202,7 +202,7 @@ function sendData() {
   var tester = document.getElementById('name').value
   var testFeedback = document.getElementById('feedback').value
   var testEnv = JSON.stringify(window.DATA['responses'].init.user_environment);
-  log(testFeedback, 'User Feedback')
+  Logger.getInstance().log(testFeedback, 'User Feedback')
   text = window.DATA.log.join('\n')
 
   var strconfirm = confirm("Are you sure you want to submit the report?");
@@ -420,7 +420,7 @@ function call(slide) {
       //TODO: changed timeout setting for testing purpose, change setting back to 10000ms when ready to deploy
       setTimeout(() => { Reveal.configure({ controls: true }) }, 100)
     } catch (e) {
-      log(e)
+      Logger.getInstance().log(e, "error");
     }
   } else {
     showControls(slide)
