@@ -61,14 +61,13 @@ var Logger = (function () {
           this.developmentNotes.push(message + slide + " :" + " " + data);
         },
         exportLogsToFile(){
-         var jsonData=  JSON.stringify(this.developmentNotes);
-         writeFile("./logFile.txt", jsonData, (err) => {
-          if (err) {
-              console.error(err);
-              return;
-          };
-          console.log("File has been created");
-      });
+          let jsonData=  JSON.stringify(this.developmentNotes);
+          let contentType = "text/plain"; //"application/json";
+          let a = document.createElement("a");
+          let file = new Blob([jsonData], {type: contentType});
+          a.href = URL.createObjectURL(file);
+          a.download = "logFile.txt";
+          a.click();
 
         },
         logItems: [],
