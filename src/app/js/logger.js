@@ -60,15 +60,27 @@ var Logger = (function () {
         addDevNote(message, slide, data){
           this.developmentNotes.push(message + slide + " :" + " " + data);
         },
-        exportLogsToFile(){
-          let jsonData=  JSON.stringify(this.developmentNotes);
-          let contentType = "text/plain"; //"application/json";
+        exportLogsToFile(session){
+          let logExport = this.toJson();
+          if(session){
+            session.sessionLog = this.toJson();
+            logExport = session;
+          }
+          let jsonData=  JSON.stringify(logExport);
+          // let contentType = "text/plain";
+          let contentType = "application/json";
           let a = document.createElement("a");
           let file = new Blob([jsonData], {type: contentType});
           a.href = URL.createObjectURL(file);
-          a.download = "logFile.txt";
+          a.download = "logFile.json";
           a.click();
 
+        },
+        toJson(){
+          return {
+            logItems: this.logItems,
+            developmentNotes: this.developmentNotes
+          }
         },
         logItems: [],
         developmentNotes:[]
