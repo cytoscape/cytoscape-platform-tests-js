@@ -14,6 +14,7 @@ class TestSession {
         this._userInformation.OS = ua.os;
         this._userInformation.browser = ua.browser;
         this.sessionLog = [];
+
     }
 
     get userInformation(){
@@ -32,18 +33,20 @@ class TestSession {
      * Opens up the session, performing the necessary steps to set things up.
      */
     open() {
-        console.log("Opening session", this.sessionId);
+       Logger.getInstance().log("Opening Session", this.sessionId);
+        // console.log("Opening session", this.sessionId);
         /**
          * Time in (ms) that the session was started.
          */
-        this.startDate = Date.now();
+        startDate = Date.now();
     }
 
     /**
      * Closes and cleans up a test session.
      */
     close() {
-        console.log("Closing session", this.sessionId);
+        Logger.getInstance().log("Closing session",this.sessionId);
+        //cylog.log("Closing session", this.sessionId);
         /**
          * Time in (ms) that the session was started.
          */
@@ -54,18 +57,16 @@ class TestSession {
         console.debug(JSON.stringify(this));
     }
 
-    /**
-     * Adds the message to the test session log.
-     * @param {*} message 
-     * @param {*} context 
-     */
-    log(message, context = 'info'){
-        const line = context + ' :: ' + message
-        this.sessionLog.push(line);
-        const log = document.getElementById('log')
-        log.innerHTML =  this.sessionLog.join('\n')
-        log.scrollTop = log.scrollHeight
-    }
+    // /**
+    //  * Adds the message to the test session log.
+    //  * @param {*} message 
+    // log(message, context = 'info'){
+    //     const line = context + ' :: ' + message
+    //     cylog.logItems.push(line);
+    //     const log = document.getElementById('log')
+    //     log.innerHTML =  cylog.logItems.join('\n')
+    //     log.scrollTop = log.scrollHeight
+    // }
 
 }
 

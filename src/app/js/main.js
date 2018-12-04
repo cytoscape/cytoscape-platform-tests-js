@@ -1,7 +1,10 @@
+
+
 window.DATA = { 'log': [], 'responses': {} }
 
 const GALFILTERED = 'https://raw.githubusercontent.com/cytoscape/cytoscape-platform-tests-js/master/networks/galFiltered.cx'
 var configurationData;
+
 
 function toggleLog() {
   const log = document.getElementById('log-container');
@@ -10,7 +13,9 @@ function toggleLog() {
 
 async function loadConfiguration() {
   const config = await fetch("../TestHarnessConfig.JSON");
-  return await config.json();
+  return await config.json().catch((rejected) => {
+    Logger.getInstance().writeGenericLog("Failed to load configuratation file","file init",undefined);
+  });
 }
 function toggleError() {
   const log = document.getElementById('error-container')
@@ -33,9 +38,11 @@ function updateError(err, level = "Critical!") {
 // catch all javascript errors and display them on the screen
 window.onerror = function (errorMsg, url, lineNumber) {
   updateError();
-  log('Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber);
+  Logger.getInstance().log('Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber);
   Reveal.configure({ controls: false })
-  }
+
+  //log('Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber);
+}
 
 function init(slide) {
   console.debug("Main init", slide, session);
@@ -60,17 +67,19 @@ function close_session(slide) {
 function galfiltered(slide) {
   const url = GALFILTERED
   cyCaller.load_file_from_url(url, function (suid) {
-    log('Loaded galfiltered with SUID ' + suid, slide.id)
+    Logger.getInstance().log('Loaded galfiltered with SUID ' + suid, slide.id);
+    //session.log('Loaded galfiltered with SUID ' + suid, slide.id)
     cyCaller.get('/v1/networks/' + suid + '/edges', function (edges) {
       edges = JSON.parse(edges)
-      log('Edges in galfiltered = ' + edges.length, slide.id)
+      Logger.getInstance().log('Edges in galfiltered = ' + edges.length, slide.id);
+      //session.log('Edges in galfiltered = ' + edges.length, slide.id)
       addResponse(slide.id)
 
       const check = slide.getElementsByClassName('edgeCountMatches')[0]
       check.innerText = 'Edge count is ' + edges.length + '?'
       cyCaller.get('/v1/networks/' + suid + '/nodes', function (nodes) {
         nodes = JSON.parse(nodes)
-        log('Nodes in galfiltered = ' + nodes.length, slide.id)
+        Logger.getInstance().log('Nodes in galfiltered = ' + nodes.length, slide.id)
         addResponse(slide.id, {
           'cyrestNodeCount': nodes.length,
           'cyrestEdgeCount': edges.length
@@ -155,8 +164,8 @@ function toggle_tests(vis) {
 }
 
 function runjasmine(slide) {
-  log(JSON.stringify(window.DATA['responses']), slide.id)
-  window.runtests()
+  Logger.getInstance().log(JSON.stringify(window.DATA['responses']), slide.id);
+  window.runtests();
 }
 
 function feedback(slide) {
@@ -193,7 +202,7 @@ function sendData() {
   var tester = document.getElementById('name').value
   var testFeedback = document.getElementById('feedback').value
   var testEnv = JSON.stringify(window.DATA['responses'].init.user_environment);
-  log(testFeedback, 'User Feedback')
+  Logger.getInstance().log(testFeedback, 'User Feedback')
   text = window.DATA.log.join('\n')
 
   var strconfirm = confirm("Are you sure you want to submit the report?");
@@ -331,13 +340,13 @@ function addResponse(name, data) {
   window.res = Object.assign(window.DATA.responses[name], data)
 }
 
-function log(message, context = 'info') {
-  const line = context + ' :: ' + message
-  window.DATA['log'].push(line)
-  const log = document.getElementById('log')
-  log.innerHTML = window.DATA['log'].join('\n')
-  log.scrollTop = log.scrollHeight
-}
+// function log(message, context = 'info') {
+//   const line = context + ' :: ' + message
+//   window.DATA['log'].push(line)
+//   const log = document.getElementById('log')
+//   log.innerHTML = window.DATA['log'].join('\n')
+//   log.scrollTop = log.scrollHeight
+// }
 
 function buildInput(n) {
   let entry = ''
@@ -379,7 +388,7 @@ function clearSession(slide, callback) {
     callback(slide)
   }).catch(err => {
     // TODO: The logger should take the responsility of updating the error alerts.
-    log("Error:" + err, slide.id);
+    Logger.getInstance().writeErrorLog("Error:" + err, slide.id);
     let friendlyUserError = `An application error occurred. Please make sure Cytoscape application is running and try again. Click the Log button for more details.`
     updateError(friendlyUserError, "Error!");
     //Disabling Controls after the capture of an error
@@ -401,8 +410,8 @@ function call(slide) {
     'close_cytoscape': close_cytoscape_slide,
     'submit': submit_slide
   }
-
-  log('Starting slide', slide.id)
+  Logger.getInstance().log('Starting slide',slide.id);
+  //session.log('Starting slide', slide.id)
   if (funcs.hasOwnProperty(slide.id)) {
     // initialize slide settings for navigation control, current page vs total page, and progress bar
     Reveal.configure({ controls: false, slideNumber: 'c/t', progress: true })
@@ -411,7 +420,7 @@ function call(slide) {
       //TODO: changed timeout setting for testing purpose, change setting back to 10000ms when ready to deploy
       setTimeout(() => { Reveal.configure({ controls: true }) }, 100)
     } catch (e) {
-      log(e)
+      Logger.getInstance().log(e, "error");
     }
   } else {
     showControls(slide)
@@ -488,6 +497,6 @@ Reveal.addEventListener('slidechanged', function (event) {
 const session = new TestSession();
 const cyCaller = new CyCaller()
 // Setting the logger callback to the session log.
-cyCaller.setLogCallBack((message, context) => session.log(message, context));
+cyCaller.setLogCallBack((message, context) => Logger.getInstance().log(message, context));
 setTimeout(() => { call(Reveal.getSlide(0)) }, 500)
 //log('Started Cytoscape Testing', 'init')

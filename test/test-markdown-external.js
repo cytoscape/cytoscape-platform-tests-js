@@ -7,7 +7,7 @@ Reveal.addEventListener( 'ready', function() {
 	});
 
 	QUnit.test( 'Horizontal separator', function( assert ) {
-		assert.strictEqual( document.querySelectorAll( '.reveal .slides>section' ).length, 2, 'found two slides' );
+		assert.strictEqual( document.querySelectorAll( '.reveal .slides>section' ).length, 3, 'found three slides' );
 	});
 
 	QUnit.test( 'Language highlighter', function( assert ) {
