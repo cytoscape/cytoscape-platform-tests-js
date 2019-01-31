@@ -1,6 +1,6 @@
 # Cytoscape Platform Testing in Javascript
 
-A web framework for running platform tests on Cytoscape Milestone releases for interactive sanity checks via CyREST. [Check out the example webapp](http://brettjsettle.github.io/cytoscape-platform-tests-js).
+A web framework for running platform tests on Cytoscape Milestone releases for interactive sanity checks via CyREST. [Check out the example webapp](https://cytoscape.org/cytoscape-platform-tests-js/).
 ## NOTE: If you are using a browser other than Chrome, there may be issues communicating with Cytoscape CyREST
 
 The webapp was created as a set of [reveal.js slides](https://github.com/hakimel/reveal.js) and tested via the [Jasmine testing framework](https://jasmine.github.io/) but can be implemented in any script or application.
